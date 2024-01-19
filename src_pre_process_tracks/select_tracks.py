@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/19 16:22:17 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/19 19:34:21 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/19 19:43:12 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -215,21 +215,30 @@ def verify_track_numbers(tracks, logger):
 if __name__ == "__main__":
     logger = configure_logging()
 
+    # Get the tracks
     logger.info("Starting track processing")
     tracks = get_tracks(logger)
+
+    # Filter the tracks by region
     logger.info("Filtering tracks by region")
     tracks = filter_tracks_by_region(tracks, logger)
 
+
+    # Here we will work only with tracks that have genesis in one of the regions
+    # over South American coast: ARG, LA-PLATA and SE-BR.
+    filtered_tracks = tracks[tracks['region'].isin(['ARG', 'LA-PLATA', 'SE-BR'])]
+
+    # Filter the tracks, excluding systems that spend 80% of their time in the over the continent
     continent_shapefile = '../natural_earth_continents/ne_50m_land.shp'
     continent_gdf = gpd.read_file(continent_shapefile)
     logger.info("Filtering tracks by continent")
-    tracks = filter_tracks_by_continent(tracks, continent_gdf)
+    filtered_tracks_no_continental = filter_tracks_by_continent(filtered_tracks, continent_gdf)
 
     verify_track_numbers(tracks)
 
     os.makedirs('../tracks_SAt_filtered', exist_ok=True)
     output_file = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
-    tracks.to_csv(output_file, index=False)
+    filtered_tracks_no_continental.to_csv(output_file, index=False)
     logger.info(f"Filtered tracks saved to {output_file}")
     logger.info("Track processing completed.")
     
