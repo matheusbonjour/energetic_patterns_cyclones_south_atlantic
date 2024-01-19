@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/19 16:22:17 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/19 19:32:09 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/19 19:34:21 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -84,7 +84,7 @@ def configure_logging():
 
     # Create handlers
     console_handler = logging.StreamHandler()
-    file_handler = logging.FileHandler('./log.select_tracks.txt')
+    file_handler = logging.FileHandler('./log.select_tracks.txt', mode='w')
 
     # Create formatters and add them to the handlers
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')

@@ -4,3 +4,5 @@
 2024-01-19 19:32:20,156 - INFO - Done.
 2024-01-19 19:32:20,168 - INFO - Filtering tracks by region
 2024-01-19 19:32:20,168 - INFO - Filtering tracks by region...
+2024-01-19 19:32:38,602 - INFO - Done.
+2024-01-19 19:32:40,251 - INFO - Filtering tracks by continent
