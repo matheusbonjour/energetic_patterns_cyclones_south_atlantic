@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/19 16:22:17 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/19 19:09:22 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/19 19:32:09 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,6 +27,8 @@ import multiprocessing
 from tqdm import tqdm
 import geopandas as gpd
 import os 
+import logging
+
 
 # Constants defining the geographic boundaries of regions of interest.
 REGIONS = {
@@ -53,7 +55,7 @@ def read_csv_file(filepath):
     """
     return pd.read_csv(filepath, header=None)
 
-def get_tracks():
+def get_tracks(logger):
     """
     Reads and merges track data from CSV files, adjusts longitude values, and filters tracks
     based on the first time step being within the defined regions.
@@ -61,16 +63,39 @@ def get_tracks():
     Returns:
     DataFrame: The merged and filtered track data.
     """
-    print("Reading raw track files...")
+    logger.info("Reading raw track files...")
     file_list = glob("../tracks_SAt/*.csv")
     with Pool() as pool:
         dfs = pool.map(read_csv_file, tqdm(file_list))
-    print("Merging tracks...")
+    logger.info("Merging tracks...")
     tracks = pd.concat(dfs, ignore_index=True)
     tracks.columns = ['track_id', 'date', 'lon vor', 'lat vor', 'vor42']
     tracks['lon vor'] = np.where(tracks['lon vor'] > 180, tracks['lon vor'] - 360, tracks['lon vor'])
-    print("Done.")
+    logger.info("Done.")
     return tracks
+
+def configure_logging():
+    """
+    Configures logging for the script.
+    """
+    # Configure logging
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.INFO)
+
+    # Create handlers
+    console_handler = logging.StreamHandler()
+    file_handler = logging.FileHandler('./log.select_tracks.txt')
+
+    # Create formatters and add them to the handlers
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(formatter)
+    file_handler.setFormatter(formatter)
+
+    # Add handlers to the logger
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+
+    return logger
 
 def is_first_step_in_region(track_group, region_bounds):
     """
@@ -108,7 +133,7 @@ def filter_tracks_for_single_region(grouped_tracks, region_name, bounds):
     result = pd.Series(region_name, index=matching_tracks)
     return result
 
-def filter_tracks_by_region(tracks):
+def filter_tracks_by_region(tracks, logger):
     """
     Filter tracks, selecting only systems with genesis in the defined regions.
     Adds a 'region' column to the DataFrame indicating the region of genesis.
@@ -120,7 +145,7 @@ def filter_tracks_by_region(tracks):
     Returns:
     DataFrame: The input tracks data with an additional 'region' column.
     """
-    print("Filtering tracks by region...")
+    logger.info("Filtering tracks by region...")
     grouped_tracks = tracks.groupby('track_id')
     tracks['region'] = None  # Initialize the 'region' column
     
@@ -132,7 +157,7 @@ def filter_tracks_by_region(tracks):
             result = future.result()
             tracks.loc[result.index, 'region'] = result
 
-    print("Done.")
+    logger.info("Done.")
     return tracks
 
 def prepare_tracks(tracks, continent_gdf):
@@ -180,23 +205,31 @@ def filter_tracks_by_continent(tracks, continent_gdf, threshold_percentage=80):
     valid_track_ids = [cyclone_id for batch in results for cyclone_id, is_valid in batch if is_valid]
     return tracks[tracks['track_id'].isin(valid_track_ids)]
 
-def verify_track_numbers(tracks):
+def verify_track_numbers(tracks, logger):
     for region_name in REGIONS:
             num_tracks = len(tracks[tracks['region'] == region_name].groupby('track_id'))
-            print(f"Number of tracks in {region_name}: {num_tracks}")
+            logger.info(f"Number of tracks in {region_name}: {num_tracks}")
     num_unmatched_tracks = len(tracks[tracks['region'].isnull()].groupby('track_id'))
-    print(f"Number of unmatched tracks: {num_unmatched_tracks}")
+    logger.info(f"Number of unmatched tracks: {num_unmatched_tracks}")
 
 if __name__ == "__main__":
-    tracks = get_tracks()
-    tracks = filter_tracks_by_region(tracks)
+    logger = configure_logging()
+
+    logger.info("Starting track processing")
+    tracks = get_tracks(logger)
+    logger.info("Filtering tracks by region")
+    tracks = filter_tracks_by_region(tracks, logger)
 
     continent_shapefile = '../natural_earth_continents/ne_50m_land.shp'
     continent_gdf = gpd.read_file(continent_shapefile)
+    logger.info("Filtering tracks by continent")
     tracks = filter_tracks_by_continent(tracks, continent_gdf)
 
     verify_track_numbers(tracks)
 
     os.makedirs('../tracks_SAt_filtered', exist_ok=True)
-    tracks.to_csv('../tracks_SAt_filtered/tracks_SAt_filtered.csv', index=False)
+    output_file = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
+    tracks.to_csv(output_file, index=False)
+    logger.info(f"Filtered tracks saved to {output_file}")
+    logger.info("Track processing completed.")
     
