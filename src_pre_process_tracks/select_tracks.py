@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/19 16:22:17 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/19 18:32:46 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/19 19:09:22 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,7 +26,7 @@ import concurrent.futures
 import multiprocessing
 from tqdm import tqdm
 import geopandas as gpd
-from functools import partial
+import os 
 
 # Constants defining the geographic boundaries of regions of interest.
 REGIONS = {
@@ -196,4 +196,7 @@ if __name__ == "__main__":
     tracks = filter_tracks_by_continent(tracks, continent_gdf)
 
     verify_track_numbers(tracks)
+
+    os.makedirs('../tracks_SAt_filtered', exist_ok=True)
+    tracks.to_csv('../tracks_SAt_filtered/tracks_SAt_filtered.csv', index=False)
     
