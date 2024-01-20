@@ -21,12 +21,12 @@ tracks_region = tracks[tracks['region'] == REGION]
 system_ids = tracks_region['track_id'].unique()
 
 # Limit to the first 3 cases for testing
-system_ids = system_ids[:3]
+system_ids = system_ids[:50]
 
 # Function to run Lorenz Cycle script for a given system ID
 def run_lorenz_cycle(id):
     try:
-        arguments = [f'{id}.nc', '-t', '-r', '-p', '-g', '-v', '--cdsapi']
+        arguments = [f'{id}.nc', '-t', '-r', '-g', '-v', '--cdsapi']
         command = f"python {LEC_PATH} " + " ".join(arguments)
         subprocess.run(command, shell=True, executable='/bin/bash')
         logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
@@ -55,7 +55,7 @@ execution_times = []
 
 # Process each system ID in parallel
 start_time = time.time()
-with ProcessPoolExecutor() as executor:
+with ProcessPoolExecutor(max_workers=50) as executor:
     list(tqdm(executor.map(run_lorenz_cycle, system_ids), total=len(system_ids)))
 end_time = time.time()
 
