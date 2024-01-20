@@ -27,6 +27,7 @@ execution_times = []
 
 try:
     # Change directory to the program directory
+    lec_dir = os.path.dirname(LEC_PATH)
     os.chdir(os.path.dirname(LEC_PATH))
     logging.info(f"Changed directory to {os.path.dirname(LEC_PATH)}")
 except Exception as e:
