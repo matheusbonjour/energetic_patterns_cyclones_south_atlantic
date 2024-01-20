@@ -45,11 +45,11 @@ except Exception as e:
 # Process each system ID
 for id in tqdm(system_ids):
     arguments = [f'{id}.nc', '-t', '-r', '-p', '-g', '-v', '--cdsapi']
-    command = f"conda activate lorenz && python {LEC_PATH} " + " ".join(arguments)
+    command = ['python', LEC_PATH] + arguments
 
     start_time = time.time()
     try:
-        subprocess.run(command, shell=True, executable='/bin/bash')
+        subprocess.run(command)
         logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
     except Exception as e:
         logging.error(f"Error running Lorenz Cycle script for ID {id}: {e}")
