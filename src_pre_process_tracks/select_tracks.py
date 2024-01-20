@@ -6,17 +6,17 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/19 16:22:17 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/20 10:59:03 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/20 12:54:13 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 """
-This scripts pre-process the tracks from the SAt dataset.
-It selects only the tracks that have genesis in the region of interest and also
-excludes systems that spend 80% of their time in the over the continent. 
-
+This script processes track data from the SAt dataset, focusing on weather systems with genesis in specific regions. 
+It filters out tracks that do not originate within predefined geographic boundaries and those spending a significant portion of their lifecycle over the continent. 
+The script utilizes parallel processing for efficiency and outputs the filtered data for further analysis.
 """
+
 
 import pandas as pd
 import numpy as np
@@ -57,11 +57,14 @@ def read_csv_file(filepath):
 
 def get_tracks(logger):
     """
-    Reads and merges track data from CSV files, adjusts longitude values, and filters tracks
-    based on the first time step being within the defined regions.
+    Reads and merges track data from CSV files located in the "../tracks_SAt" directory.
+    Adjusts longitude values and filters tracks based on the first time step being within predefined regions.
+    
+    Parameters:
+    logger (logging.Logger): Logger for logging information.
 
     Returns:
-    DataFrame: The merged and filtered track data.
+    pd.DataFrame: The merged and filtered track data with columns for track ID, date, longitude, latitude, and vor42.
     """
     logger.info("Reading raw track files...")
     file_list = glob("../tracks_SAt/*.csv")
@@ -141,6 +144,7 @@ def filter_tracks_by_region(tracks, logger):
 
     Parameters:
     tracks (DataFrame): The input tracks data.
+    logger (logging.Logger): Logger for logging information.
 
     Returns:
     DataFrame: The input tracks data with an additional 'region' column.
