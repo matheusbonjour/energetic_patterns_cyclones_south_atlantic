@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO,
 
 FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
 REGION = 'SE-BR'
-LEC_PATH = '../../lorenz-cycle/lorenz_cycle.py'
+LEC_PATH = os.path.abspath('../../lorenz-cycle/lorenz_cycle.py')  # Get absolute path
 
 tracks = pd.read_csv(FILTERED_TRACKS)
 tracks_region = tracks[tracks['region'] == REGION]
@@ -28,8 +28,8 @@ execution_times = []
 try:
     # Change directory to the program directory
     lec_dir = os.path.dirname(LEC_PATH)
-    os.chdir(os.path.dirname(lec_dir))
-    logging.info(f"Changed directory to {os.path.dirname(LEC_PATH)}")
+    os.chdir(lec_dir)
+    logging.info(f"Changed directory to {lec_dir}")
 except Exception as e:
     logging.error(f"Error changing directory: {e}")
     exit(1)
