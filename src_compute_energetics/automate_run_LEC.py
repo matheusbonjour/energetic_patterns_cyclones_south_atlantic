@@ -4,6 +4,7 @@ import subprocess
 import time
 from tqdm import tqdm
 import logging
+from concurrent.futures import ProcessPoolExecutor
 
 # Logging configuration
 logging.basicConfig(level=logging.INFO, 
@@ -22,8 +23,15 @@ system_ids = tracks_region['track_id'].unique()
 # Limit to the first 3 cases for testing
 system_ids = system_ids[:3]
 
-# Store execution times
-execution_times = []
+# Function to run Lorenz Cycle script for a given system ID
+def run_lorenz_cycle(id):
+    try:
+        arguments = [f'{id}.nc', '-t', '-r', '-p', '-g', '-v', '--cdsapi']
+        command = f"python {LEC_PATH} " + " ".join(arguments)
+        subprocess.run(command, shell=True, executable='/bin/bash')
+        logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
+    except Exception as e:
+        logging.error(f"Error running Lorenz Cycle script for ID {id}: {e}")
 
 try:
     # Change directory to the program directory
@@ -42,26 +50,18 @@ except Exception as e:
     logging.error(f"Error pulling latest changes from Git: {e}")
     exit(1)
 
-# Process each system ID
-for id in tqdm(system_ids):
-    arguments = [f'{id}.nc', '-t', '-r', '-p', '-g', '-v', '--cdsapi']
-    command = ['python', LEC_PATH] + arguments
+# Store execution times
+execution_times = []
 
-    start_time = time.time()
-    try:
-        subprocess.run(command)
-        logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
-    except Exception as e:
-        logging.error(f"Error running Lorenz Cycle script for ID {id}: {e}")
-        continue
-    end_time = time.time()
+# Process each system ID in parallel
+start_time = time.time()
+with ProcessPoolExecutor() as executor:
+    list(tqdm(executor.map(run_lorenz_cycle, system_ids), total=len(system_ids)))
+end_time = time.time()
 
-    # Record the time taken for this execution
-    execution_times.append(end_time - start_time)
-
-# Calculate total and mean execution time
-total_time = sum(execution_times)
-mean_time = total_time / len(execution_times)
+# Record the total time taken for this execution
+total_time = end_time - start_time
+mean_time = total_time / len(system_ids)
 
 logging.info(f'Total time for {len(system_ids)} cases: {total_time:.2f} seconds')
 logging.info(f'Mean time per case: {mean_time:.2f} seconds')
