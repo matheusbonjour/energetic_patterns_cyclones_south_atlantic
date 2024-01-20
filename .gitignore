@@ -22,9 +22,6 @@ Desktop.ini # Windows specific
 .vscode/
 .idea/
 
-# Output directories
-tracks_SAt_filtered/
-
 # Shapefile related files (if not needed in version control)
 natural_earth_continents/*.shx
 natural_earth_continents/*.dbf
