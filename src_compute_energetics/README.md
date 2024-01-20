@@ -1,7 +1,7 @@
 # src_compute_energetics
 
 ## Overview
-This directory contains scripts for computing the energetics of cyclones in the South Atlantic using the pre-processed track data. These scripts analyze the filtered data to determine energetic patterns and characteristics of cyclones.
+This directory contains scripts for pre-processing track data and computing the energetics of cyclones in the South Atlantic . These scripts analyze the filtered data to determine energetic patterns and characteristics of cyclones.
 
 ## Scripts
 
