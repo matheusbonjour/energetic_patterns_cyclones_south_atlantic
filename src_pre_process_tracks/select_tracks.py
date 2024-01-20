@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/19 16:22:17 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/19 19:43:12 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/20 10:59:03 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -234,7 +234,7 @@ if __name__ == "__main__":
     logger.info("Filtering tracks by continent")
     filtered_tracks_no_continental = filter_tracks_by_continent(filtered_tracks, continent_gdf)
 
-    verify_track_numbers(tracks)
+    verify_track_numbers(tracks, logger)
 
     os.makedirs('../tracks_SAt_filtered', exist_ok=True)
     output_file = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
