@@ -1,4 +1,4 @@
-# README for South Atlantic Cyclone Energetics Project
+# South Atlantic Cyclone Energetics Patterns Project
 
 ## Overview
 This project aims to determine energetic patterns of cyclones in the South Atlantic. It involves pre-processing cyclone track data from the SAt dataset and subsequent analysis to compute the energetics of these weather systems. The project is structured into several directories, each serving a specific purpose in the workflow.
