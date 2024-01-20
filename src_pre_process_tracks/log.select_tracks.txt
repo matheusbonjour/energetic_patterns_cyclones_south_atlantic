@@ -1,7 +1,18 @@
-2024-01-19 19:41:55,672 - INFO - Starting track processing
-2024-01-19 19:41:55,672 - INFO - Reading raw track files...
-2024-01-19 19:42:01,168 - INFO - Merging tracks...
-2024-01-19 19:42:01,402 - INFO - Done.
-2024-01-19 19:42:01,413 - INFO - Filtering tracks by region
-2024-01-19 19:42:01,414 - INFO - Filtering tracks by region...
-2024-01-19 19:42:18,719 - INFO - Done.
+2024-01-20 10:59:35,456 - INFO - Starting track processing
+2024-01-20 10:59:35,456 - INFO - Reading raw track files...
+2024-01-20 10:59:36,240 - INFO - Merging tracks...
+2024-01-20 10:59:36,458 - INFO - Done.
+2024-01-20 10:59:36,474 - INFO - Filtering tracks by region
+2024-01-20 10:59:36,474 - INFO - Filtering tracks by region...
+2024-01-20 10:59:51,120 - INFO - Done.
+2024-01-20 10:59:51,731 - INFO - Filtering tracks by continent
+2024-01-20 11:27:02,136 - INFO - Number of tracks in SE-BR: 1631
+2024-01-20 11:27:02,375 - INFO - Number of tracks in LA-PLATA: 2718
+2024-01-20 11:27:02,551 - INFO - Number of tracks in ARG: 4480
+2024-01-20 11:27:02,715 - INFO - Number of tracks in SE-SAO: 5175
+2024-01-20 11:27:02,820 - INFO - Number of tracks in SA-NAM: 1535
+2024-01-20 11:27:02,939 - INFO - Number of tracks in AT-PEN: 1685
+2024-01-20 11:27:03,052 - INFO - Number of tracks in WEDDELL: 1738
+2024-01-20 11:27:03,569 - INFO - Number of unmatched tracks: 30195
+2024-01-20 11:27:15,209 - INFO - Filtered tracks saved to ../tracks_SAt_filtered/tracks_SAt_filtered.csv
+2024-01-20 11:27:15,209 - INFO - Track processing completed.
