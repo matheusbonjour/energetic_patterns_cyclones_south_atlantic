@@ -59,9 +59,10 @@ with ProcessPoolExecutor() as executor:
     list(tqdm(executor.map(run_lorenz_cycle, system_ids), total=len(system_ids)))
 end_time = time.time()
 
-# Record the total time taken for this execution
-total_time = end_time - start_time
-mean_time = total_time / len(system_ids)
+# Record the total time taken for this execution and convert it to hours
+total_time_seconds = end_time - start_time
+total_time_hours = total_time_seconds / 3600
+mean_time_hours = total_time_hours / len(system_ids)
 
-logging.info(f'Total time for {len(system_ids)} cases: {total_time:.2f} seconds')
-logging.info(f'Mean time per case: {mean_time:.2f} seconds')
+logging.info(f'Total time for {len(system_ids)} cases: {total_time_hours:.2f} hours')
+logging.info(f'Mean time per case: {mean_time_hours:.2f} hours')
