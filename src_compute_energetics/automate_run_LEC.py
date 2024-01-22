@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/22 17:21:49 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/22 19:18:28 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -86,7 +86,8 @@ tracks_region = tracks[tracks['region'] == REGION]
 system_ids = tracks_region['track_id'].unique()
 
 # Limit to the first 10 cases for testing
-system_ids = system_ids[:5]
+import random
+system_ids = random.sample(list(system_ids), 5) 
 
 # Change directory to the Lorenz Cycle program directory
 try:
