@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    automate_run_LEC.py                                :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
+#    Updated: 2024/01/22 14:09:29 by daniloceano      ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import pandas as pd
 import os
 import subprocess
@@ -6,35 +18,76 @@ from tqdm import tqdm
 import logging
 from concurrent.futures import ProcessPoolExecutor
 
-# Logging configuration
-logging.basicConfig(level=logging.INFO, 
-                    format='%(asctime)s - %(levelname)s - %(message)s', 
-                    filename='log.automate_run_LEC.txt', 
-                    filemode='w')  # 'w' for overwrite, 'a' for append
+# # Logging configuration
+# logging.basicConfig(level=logging.INFO, 
+#                     format='%(asctime)s - %(levelname)s - %(message)s', 
+#                     filename='log.automate_run_LEC.txt', 
+#                     filemode='w')  # 'w' for overwrite, 'a' for append
 
 FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
 REGION = 'SE-BR'
 LEC_PATH = os.path.abspath('../../lorenz-cycle/lorenz_cycle.py')  # Get absolute path
 
-tracks = pd.read_csv(FILTERED_TRACKS)
-tracks_region = tracks[tracks['region'] == REGION]
-system_ids = tracks_region['track_id'].unique()
+class TqdmLoggingHandler(logging.Handler):
+    """
+    Custom logging handler using tqdm to write log messages.
+    """
+    def __init__(self, level=logging.NOTSET):
+        super().__init__(level)
 
-# Limit to the first 3 cases for testing
-system_ids = system_ids[:10]
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.write(msg)
+        except Exception:
+            self.handleError(record)
 
-# Function to run Lorenz Cycle script for a given system ID
-def run_lorenz_cycle(id):
+def prepare_track_data(system_id):
+    """
+    Prepare and save track data for a given system ID in the required format.
+
+    Args:
+    system_id (int): The ID of the system for which to prepare the track data.
+    """
     try:
-        arguments = [f'{id}.nc', '-t', '-r', '-g', '-v', '-p', '-z', '--cdsapi']
+        track_data = tracks_region[tracks_region['track_id'] == system_id]
+        formatted_data = track_data[['date', 'lat vor', 'lon vor', 'vor42']]
+        formatted_data.columns = ['time', 'Lat', 'Lon', 'min_max_zeta_850']
+        formatted_data.to_csv('inputs/track', index=False, sep=';')
+    except Exception as e:
+        logging.error(f"Error preparing track data for ID {system_id}: {e}")
+
+def run_lorenz_cycle(id):
+    """
+    Run the Lorenz Cycle script for a given system ID after preparing the track data.
+
+    Args:
+    id (int): The system ID for which to run the Lorenz Cycle script.
+    """
+    prepare_track_data(id)
+    try:
+        arguments = [f'{id}_cdsapi.nc', '-t', '-r', '-g', '-v', '-p', '-z', '--cdsapi']
         command = f"python {LEC_PATH} " + " ".join(arguments)
         subprocess.run(command, shell=True, executable='/bin/bash')
         logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
     except Exception as e:
         logging.error(f"Error running Lorenz Cycle script for ID {id}: {e}")
 
+# Update logging configuration to use the custom handler
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s', 
+                    handlers=[TqdmLoggingHandler(), 
+                              logging.FileHandler('log.automate_run_LEC.txt', mode='w')])
+
+tracks = pd.read_csv(FILTERED_TRACKS)
+tracks_region = tracks[tracks['region'] == REGION]
+system_ids = tracks_region['track_id'].unique()
+
+# Limit to the first 10 cases for testing
+system_ids = system_ids[:2]
+
+# Change directory to the Lorenz Cycle program directory
 try:
-    # Change directory to the program directory
     lec_dir = os.path.dirname(LEC_PATH)
     os.chdir(lec_dir)
     logging.info(f"Changed directory to {lec_dir}")
@@ -42,27 +95,34 @@ except Exception as e:
     logging.error(f"Error changing directory: {e}")
     exit(1)
 
+# Pull the latest changes from Git
 try:
-    # Pull the latest changes from Git
     subprocess.run(["git", "pull"])
     logging.info("Successfully pulled latest changes from Git")
 except Exception as e:
     logging.error(f"Error pulling latest changes from Git: {e}")
     exit(1)
 
-# Store execution times
-execution_times = []
+# Determine the number of CPU cores to use
+max_cores = os.cpu_count()
+num_workers = max(1, max_cores - 4) if max_cores else 1
+logging.info(f"Using {num_workers} CPU cores")
 
 # Process each system ID in parallel
 start_time = time.time()
-with ProcessPoolExecutor(max_workers=50) as executor:
-    list(tqdm(executor.map(run_lorenz_cycle, system_ids), total=len(system_ids)))
+logging.info(f"Starting {len(system_ids)} cases at {start_time}")
+with ProcessPoolExecutor(max_workers=num_workers) as executor:
+    for _ in tqdm(executor.map(run_lorenz_cycle, system_ids), total=len(system_ids), file=TqdmLoggingHandler()):
+        pass
 end_time = time.time()
+logging.info(f"Finished {len(system_ids)} cases at {end_time}")
 
-# Record the total time taken for this execution and convert it to hours
+# Calculate and log execution times
 total_time_seconds = end_time - start_time
+total_time_minutes = total_time_seconds / 60
 total_time_hours = total_time_seconds / 3600
+mean_time_minutes = total_time_minutes / len(system_ids)
 mean_time_hours = total_time_hours / len(system_ids)
 
-logging.info(f'Total time for {len(system_ids)} cases: {total_time_hours:.2f} hours')
-logging.info(f'Mean time per case: {mean_time_hours:.2f} hours')
+logging.info(f'Total time for {len(system_ids)} cases: {total_time_hours:.2f} hours ({total_time_minutes:.2f} minutes)')
+logging.info(f'Mean time per case: {mean_time_hours:.2f} hours ({mean_time_minutes:.2f} minutes)')
