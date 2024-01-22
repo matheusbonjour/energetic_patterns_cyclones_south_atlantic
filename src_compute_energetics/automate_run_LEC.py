@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/22 15:08:54 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/22 16:05:07 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -66,7 +66,7 @@ def run_lorenz_cycle(id):
     """
     prepare_track_data(id)
     try:
-        arguments = [f'{id}_cdsapi.nc', '-t', '-r', '-g', '-v', '-p', '-z', '--cdsapi']
+        arguments = [f'{id}_ERA5.nc', '-t', '-r', '-g', '-v', '-p', '-z', '--cdsapi']
         command = f"python {LEC_PATH} " + " ".join(arguments)
         subprocess.run(command, shell=True, executable='/bin/bash')
         logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
