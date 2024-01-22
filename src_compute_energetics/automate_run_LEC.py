@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/22 14:09:29 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/22 15:08:54 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -111,9 +111,14 @@ logging.info(f"Using {num_workers} CPU cores")
 # Process each system ID in parallel
 start_time = time.time()
 logging.info(f"Starting {len(system_ids)} cases at {start_time}")
+
+completed_cases = 0
 with ProcessPoolExecutor(max_workers=num_workers) as executor:
-    for _ in tqdm(executor.map(run_lorenz_cycle, system_ids), total=len(system_ids), file=TqdmLoggingHandler()):
-        pass
+    for id in executor.map(run_lorenz_cycle, system_ids):
+        completed_cases += 1
+        if completed_cases % 5 == 0 or completed_cases == len(system_ids):
+            logging.info(f"Completed {completed_cases}/{len(system_ids)} cases")
+
 end_time = time.time()
 logging.info(f"Finished {len(system_ids)} cases at {end_time}")
 
