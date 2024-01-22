@@ -6,11 +6,12 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/22 16:05:07 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/22 17:19:23 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import pandas as pd
+import numpy as np
 import os
 import subprocess
 import time
@@ -53,6 +54,7 @@ def prepare_track_data(system_id):
         track_data = tracks_region[tracks_region['track_id'] == system_id]
         formatted_data = track_data[['date', 'lat vor', 'lon vor', 'vor42']]
         formatted_data.columns = ['time', 'Lat', 'Lon', 'min_max_zeta_850']
+        formatted_data['min_max_zeta_850'] = - np.abs(formatted_data['min_max_zeta_850'])
         formatted_data.to_csv('inputs/track', index=False, sep=';')
     except Exception as e:
         logging.error(f"Error preparing track data for ID {system_id}: {e}")
