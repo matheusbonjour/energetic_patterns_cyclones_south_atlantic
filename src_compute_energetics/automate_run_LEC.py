@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/23 00:16:41 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/23 09:38:39 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,6 +49,7 @@ def prepare_track_data(system_id):
 def run_lorenz_cycle(id):
     """
     Run the Lorenz Cycle script for a given system ID after preparing the track data.
+    Returns the system ID upon completion.
 
     Args:
     id (int): The system ID for which to run the Lorenz Cycle script.
@@ -64,6 +65,8 @@ def run_lorenz_cycle(id):
             logging.error(f"Error running Lorenz Cycle script for ID {id}: {e}")
     else:
         logging.error(f"Error running Lorenz Cycle script for ID {id}: Could not prepare track data")
+
+    return id
 
 # Update logging configuration to use the custom handler
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
@@ -107,9 +110,9 @@ logging.info(f"Starting {len(system_ids)} cases at {formatted_start_time}")
 
 completed_cases = 0
 with ProcessPoolExecutor(max_workers=num_workers) as executor:
-    for _ in executor.map(run_lorenz_cycle, system_ids):
+    for completed_id in executor.map(run_lorenz_cycle, system_ids):
         completed_cases += 1
-        logging.info(f"Completed {completed_cases}/{len(system_ids)} cases")
+        logging.info(f"Completed {completed_cases}/{len(system_ids)} cases (ID {completed_id})")
         
 end_time = time.time()
 formatted_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end_time))
