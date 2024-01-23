@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/22 23:57:13 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/22 23:58:48 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,7 +33,8 @@ def prepare_track_data(system_id):
     """
     try:
         track_data = tracks_region[tracks_region['track_id'] == system_id]
-        formatted_data = track_data[['date', 'lat vor', 'lon vor', 'vor42']]
+        # Explicitly create a copy of the DataFrame to avoid SettingWithCopyWarning
+        formatted_data = track_data[['date', 'lat vor', 'lon vor', 'vor42']].copy()
         formatted_data.columns = ['time', 'Lat', 'Lon', 'min_max_zeta_850']
         formatted_data['min_max_zeta_850'] = - np.abs(formatted_data['min_max_zeta_850'])
         # Create a unique input file for each system ID
@@ -43,6 +44,7 @@ def prepare_track_data(system_id):
     except Exception as e:
         logging.error(f"Error preparing track data for ID {system_id}: {e}")
         return None
+
 
 def run_lorenz_cycle(id):
     """
