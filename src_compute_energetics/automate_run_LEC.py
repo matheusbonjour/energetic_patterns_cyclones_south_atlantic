@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/22 23:58:48 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/23 00:16:41 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,7 +76,7 @@ system_ids = tracks_region['track_id'].unique()
 
 # Limit to the first 10 cases for testing
 import random
-system_ids = random.sample(list(system_ids), 5) 
+system_ids = random.sample(list(system_ids), 100) 
 
 # Change directory to the Lorenz Cycle program directory
 try:
