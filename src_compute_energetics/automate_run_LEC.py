@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/23 09:38:39 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/23 18:51:35 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 
 FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
-REGION = 'SE-BR'
+REGION = 'ARG'
 LEC_PATH = os.path.abspath('../../lorenz-cycle/lorenz_cycle.py')  # Get absolute path
 
 def prepare_track_data(system_id):
@@ -77,9 +77,9 @@ tracks = pd.read_csv(FILTERED_TRACKS)
 tracks_region = tracks[tracks['region'] == REGION]
 system_ids = tracks_region['track_id'].unique()
 
-# Limit to the first 10 cases for testing
-import random
-system_ids = random.sample(list(system_ids), 100) 
+# # Limit to the first 10 cases for testing
+# import random
+# system_ids = random.sample(list(system_ids), 100) 
 
 # Change directory to the Lorenz Cycle program directory
 try:
