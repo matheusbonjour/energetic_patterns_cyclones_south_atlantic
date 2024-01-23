@@ -6,46 +6,27 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/22 19:18:28 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/22 23:29:06 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-import pandas as pd
-import numpy as np
 import os
 import subprocess
 import time
-from tqdm import tqdm
 import logging
+import pandas as pd
+import numpy as np
+from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
-
-# # Logging configuration
-# logging.basicConfig(level=logging.INFO, 
-#                     format='%(asctime)s - %(levelname)s - %(message)s', 
-#                     filename='log.automate_run_LEC.txt', 
-#                     filemode='w')  # 'w' for overwrite, 'a' for append
 
 FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
 REGION = 'SE-BR'
 LEC_PATH = os.path.abspath('../../lorenz-cycle/lorenz_cycle.py')  # Get absolute path
 
-class TqdmLoggingHandler(logging.Handler):
-    """
-    Custom logging handler using tqdm to write log messages.
-    """
-    def __init__(self, level=logging.NOTSET):
-        super().__init__(level)
-
-    def emit(self, record):
-        try:
-            msg = self.format(record)
-            tqdm.write(msg)
-        except Exception:
-            self.handleError(record)
-
 def prepare_track_data(system_id):
     """
     Prepare and save track data for a given system ID in the required format.
+    Each system ID will have its own input file.
 
     Args:
     system_id (int): The ID of the system for which to prepare the track data.
@@ -55,9 +36,13 @@ def prepare_track_data(system_id):
         formatted_data = track_data[['date', 'lat vor', 'lon vor', 'vor42']]
         formatted_data.columns = ['time', 'Lat', 'Lon', 'min_max_zeta_850']
         formatted_data['min_max_zeta_850'] = - np.abs(formatted_data['min_max_zeta_850'])
-        formatted_data.to_csv('inputs/track', index=False, sep=';')
+        # Create a unique input file for each system ID
+        input_file_path = f'inputs/track_{system_id}.csv'
+        formatted_data.to_csv(input_file_path, index=False, sep=';')
+        return input_file_path
     except Exception as e:
         logging.error(f"Error preparing track data for ID {system_id}: {e}")
+        return None
 
 def run_lorenz_cycle(id):
     """
@@ -66,20 +51,22 @@ def run_lorenz_cycle(id):
     Args:
     id (int): The system ID for which to run the Lorenz Cycle script.
     """
-    prepare_track_data(id)
-    try:
-        arguments = [f'{id}_ERA5.nc', '-t', '-r', '-g', '-v', '-p', '-z', '--cdsapi']
-        command = f"python {LEC_PATH} " + " ".join(arguments)
-        subprocess.run(command, shell=True, executable='/bin/bash')
-        logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
-    except Exception as e:
-        logging.error(f"Error running Lorenz Cycle script for ID {id}: {e}")
+    input_track_path = prepare_track_data(id)
+    if input_track_path:
+        try:
+            arguments = [f'{id}_ERA5.nc', '-t', '-r', '-g', '-v', '-p', '-z', '--cdsapi', input_track_path]
+            command = f"python {LEC_PATH} " + " ".join(arguments)
+            subprocess.run(command, shell=True, executable='/bin/bash')
+            logging.info(f"Successfully ran Lorenz Cycle script for ID {id}")
+        except Exception as e:
+            logging.error(f"Error running Lorenz Cycle script for ID {id}: {e}")
+    else:
+        logging.error(f"Error running Lorenz Cycle script for ID {id}: Could not prepare track data")
 
 # Update logging configuration to use the custom handler
-logging.basicConfig(level=logging.INFO, 
-                    format='%(asctime)s - %(levelname)s - %(message)s', 
-                    handlers=[TqdmLoggingHandler(), 
-                              logging.FileHandler('log.automate_run_LEC.txt', mode='w')])
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler('log.automate_run_LEC.txt', mode='w')])
+
 
 tracks = pd.read_csv(FILTERED_TRACKS)
 tracks_region = tracks[tracks['region'] == REGION]
@@ -111,19 +98,20 @@ max_cores = os.cpu_count()
 num_workers = max(1, max_cores - 4) if max_cores else 1
 logging.info(f"Using {num_workers} CPU cores")
 
-# Process each system ID in parallel
+# Process each system ID in parallel and log progress
 start_time = time.time()
-logging.info(f"Starting {len(system_ids)} cases at {start_time}")
+formatted_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(start_time))
+logging.info(f"Starting {len(system_ids)} cases at {formatted_start_time}")
 
 completed_cases = 0
 with ProcessPoolExecutor(max_workers=num_workers) as executor:
-    for id in executor.map(run_lorenz_cycle, system_ids):
+    for _ in executor.map(run_lorenz_cycle, system_ids):
         completed_cases += 1
-        if completed_cases % 5 == 0 or completed_cases == len(system_ids):
-            logging.info(f"Completed {completed_cases}/{len(system_ids)} cases")
-
+        logging.info(f"Completed {completed_cases}/{len(system_ids)} cases")
+        
 end_time = time.time()
-logging.info(f"Finished {len(system_ids)} cases at {end_time}")
+formatted_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end_time))
+logging.info(f"Finished {len(system_ids)} cases at {formatted_end_time}")
 
 # Calculate and log execution times
 total_time_seconds = end_time - start_time
