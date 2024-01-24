@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/23 18:55:00 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/24 09:24:00 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -78,9 +78,9 @@ tracks = pd.read_csv(FILTERED_TRACKS)
 tracks_region = tracks[tracks['region'] == REGION]
 system_ids = tracks_region['track_id'].unique()
 
-# # Limit to the first 10 cases for testing
-# import random
-# system_ids = random.sample(list(system_ids), 100) 
+# Limit the number of cases for testing
+import random
+system_ids = random.sample(list(system_ids), 1) 
 
 # Change directory to the Lorenz Cycle program directory
 try:
