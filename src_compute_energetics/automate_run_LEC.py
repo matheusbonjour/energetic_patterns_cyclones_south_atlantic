@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/26 09:25:37 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/01/28 11:56:26 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,6 +22,25 @@ from concurrent.futures import ProcessPoolExecutor
 FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
 REGION = 'ARG'
 LEC_PATH = os.path.abspath('../../lorenz-cycle/lorenz_cycle.py')  # Get absolute path
+
+CDSAPI_PATH = os.path.expanduser('~/.cdsapi')
+CDSAPI_SUFFIXES = ['.cdsapi-Danilo', '.cdsapi-Victor', '.cdsapi-Malu']  # Add other suffixes as needed
+SUBPROCESS_BATCH_SIZE = 50  # Number of subprocesses after which to switch .cdsapi file
+subprocess_counter = 0  # Global counter to track the number of subprocesses run
+
+def copy_cdsapi(suffix):
+    """
+    Copies a specific .cdsapi file to the default .cdsapi location.
+    Args:
+    suffix (str): The suffix of the .cdsapi file to be copied.
+    """
+    try:
+        source_path = os.path.expanduser(f'~/{suffix}')
+        subprocess.run(['cp', source_path, CDSAPI_PATH], check=True)
+        logging.info(f"Copied {source_path} to {CDSAPI_PATH}")
+    except Exception as e:
+        logging.error(f"Error copying {source_path} to {CDSAPI_PATH}: {e}")
+
 
 def prepare_track_data(system_id):
     """
@@ -45,15 +64,15 @@ def prepare_track_data(system_id):
         logging.error(f"Error preparing track data for ID {system_id}: {e}")
         return None
 
-
 def run_lorenz_cycle(id):
-    """
-    Run the Lorenz Cycle script for a given system ID after preparing the track data.
-    Returns the system ID upon completion.
+    global subprocess_counter
+    subprocess_counter += 1
 
-    Args:
-    id (int): The system ID for which to run the Lorenz Cycle script.
-    """
+    # Switch .cdsapi file for every SUBPROCESS_BATCH_SIZE subprocesses
+    if subprocess_counter % SUBPROCESS_BATCH_SIZE == 0:
+        suffix_index = (subprocess_counter // SUBPROCESS_BATCH_SIZE - 1) % len(CDSAPI_SUFFIXES)
+        copy_cdsapi(CDSAPI_SUFFIXES[suffix_index])
+
     input_track_path = prepare_track_data(id)
     if input_track_path:
         try:
@@ -78,9 +97,9 @@ tracks = pd.read_csv(FILTERED_TRACKS)
 tracks_region = tracks[tracks['region'] == REGION]
 system_ids = tracks_region['track_id'].unique()
 
-# Limit the number of cases for testing
-import random
-system_ids = random.sample(list(system_ids), 50) 
+# # Limit the number of cases for testing
+# import random
+# system_ids = random.sample(list(system_ids), 50) 
 
 # Change directory to the Lorenz Cycle program directory
 try:
