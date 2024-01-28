@@ -31,3 +31,4 @@ natural_earth_continents/*.cpg
 
 # Add additional file patterns or directories as required
 nohup*
+*log.*
