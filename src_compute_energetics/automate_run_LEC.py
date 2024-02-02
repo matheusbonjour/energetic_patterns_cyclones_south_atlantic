@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/02 14:01:30 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/02 16:48:32 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,6 +21,10 @@ import pandas as pd
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor
 from datetime import datetime
+
+# Update logging configuration to use the custom handler
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler('log.automate_run_LEC.txt', mode='w')])
 
 overall_start_time = time.time()
 
@@ -141,10 +145,6 @@ CDSAPIRC_SUFFIXES = get_cdsapi_keys()
 
 # Initialize subprocess_counter with the number of already evaluated systems
 subprocess_counter = count_evaluated_systems()
-
-# Update logging configuration to use the custom handler
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
-                    handlers=[logging.FileHandler('log.automate_run_LEC.txt', mode='w')])
 
 logging.info(f"Starting automate_run_LEC.py for region: {REGION}")
 
