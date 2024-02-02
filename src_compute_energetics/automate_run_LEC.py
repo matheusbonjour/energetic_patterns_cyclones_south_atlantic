@@ -6,27 +6,53 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/01/28 11:56:26 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/02 10:36:48 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import os
+import glob
 import subprocess
 import time
 import logging
 import pandas as pd
 import numpy as np
-from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor
 
 FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
 REGION = 'ARG'
 LEC_PATH = os.path.abspath('../../lorenz-cycle/lorenz_cycle.py')  # Get absolute path
+LEC_RESULTS_DIR = os.path.abspath('../../LEC_Results')  # Get absolute PATH
 
 CDSAPI_PATH = os.path.expanduser('~/.cdsapi')
-CDSAPI_SUFFIXES = ['.cdsapi-Danilo', '.cdsapi-Victor', '.cdsapi-Malu']  # Add other suffixes as needed
 SUBPROCESS_BATCH_SIZE = 50  # Number of subprocesses after which to switch .cdsapi file
-subprocess_counter = 0  # Global counter to track the number of subprocesses run
+
+def count_evaluated_systems():
+    """
+    Counts the number of systems that have been evaluated based on the presence of results files.
+
+    Returns:
+    int: The number of evaluated systems.
+    """
+    evaluated_count = 0
+    for dirname in os.listdir(LEC_RESULTS_DIR):
+        if dirname.endswith('_ERA5_track') and os.path.exists(os.path.join(LEC_RESULTS_DIR, dirname, f"{dirname}_results.csv")):
+            evaluated_count += 1
+    return evaluated_count
+
+def get_cdsapi_keys():
+    """
+    Lists all files in the home directory that match the pattern 'cdsapi-*'.
+
+    Returns:
+    list: A list of filenames matching the pattern.
+    """
+    home_dir = os.path.expanduser('~')
+    pattern = os.path.join(home_dir, 'cdsapi-*')
+    files = glob.glob(pattern)
+    # Extract file suffixes from the full paths
+    suffixes = [os.path.basename(file) for file in files]
+    return suffixes
 
 def copy_cdsapi(suffix):
     """
@@ -63,15 +89,33 @@ def prepare_track_data(system_id):
     except Exception as e:
         logging.error(f"Error preparing track data for ID {system_id}: {e}")
         return None
+    
+def check_results_exist(system_id):
+    """
+    Check if results for the given system ID already exist.
+
+    Args:
+    system_id (int): The system ID to check.
+
+    Returns:
+    bool: True if results exist, False otherwise.
+    """
+    results_file_path = os.path.join(LEC_RESULTS_DIR, f"{system_id}_ERA5_track", f"{system_id}_ERA5_track_results.csv")
+    return os.path.exists(results_file_path)
 
 def run_lorenz_cycle(id):
     global subprocess_counter
     subprocess_counter += 1
 
+    if check_results_exist(id):
+        logging.info(f"Results already exist for system ID {id}, skipping.")
+        return id
+
     # Switch .cdsapi file for every SUBPROCESS_BATCH_SIZE subprocesses
     if subprocess_counter % SUBPROCESS_BATCH_SIZE == 0:
         suffix_index = (subprocess_counter // SUBPROCESS_BATCH_SIZE - 1) % len(CDSAPI_SUFFIXES)
         copy_cdsapi(CDSAPI_SUFFIXES[suffix_index])
+        logging.info(f"Switched .cdsapi file to {CDSAPI_SUFFIXES[suffix_index]}")
 
     input_track_path = prepare_track_data(id)
     if input_track_path:
@@ -87,6 +131,12 @@ def run_lorenz_cycle(id):
 
     return id
 
+
+CDSAPI_SUFFIXES = get_cdsapi_keys()
+
+# Initialize subprocess_counter with the number of already evaluated systems
+subprocess_counter = count_evaluated_systems()
+
 # Update logging configuration to use the custom handler
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler('log.automate_run_LEC.txt', mode='w')])
@@ -96,10 +146,6 @@ logging.info(f"Starting automate_run_LEC.py for region: {REGION}")
 tracks = pd.read_csv(FILTERED_TRACKS)
 tracks_region = tracks[tracks['region'] == REGION]
 system_ids = tracks_region['track_id'].unique()
-
-# # Limit the number of cases for testing
-# import random
-# system_ids = random.sample(list(system_ids), 50) 
 
 # Change directory to the Lorenz Cycle program directory
 try:
