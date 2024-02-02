@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/02 13:12:53 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/02 13:57:57 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -52,6 +52,8 @@ def get_cdsapi_keys():
     """
     home_dir = os.path.expanduser('~')
     pattern = os.path.join(home_dir, 'cdsapirc-*')
+    print(os.getcwd())
+    sys.exit(1)
     files = glob.glob(pattern)
     # Extract file suffixes from the full paths
     suffixes = [os.path.basename(file) for file in files]

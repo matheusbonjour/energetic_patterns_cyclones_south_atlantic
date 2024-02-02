@@ -32,3 +32,4 @@ natural_earth_continents/*.cpg
 # Add additional file patterns or directories as required
 nohup*
 *log.*
+src_compute_energetics/log.select_tracks.txt
