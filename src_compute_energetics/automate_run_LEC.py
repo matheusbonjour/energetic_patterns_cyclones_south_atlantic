@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/02 10:36:48 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/02 11:33:20 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,6 +18,10 @@ import logging
 import pandas as pd
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor
+from datetime import datetime
+
+overall_start_time = time.time()
+
 
 FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
 REGION = 'ARG'
@@ -174,11 +178,17 @@ start_time = time.time()
 formatted_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(start_time))
 logging.info(f"Starting {len(system_ids)} cases at {formatted_start_time}")
 
-completed_cases = 0
+# Inside the loop, after processing each system, calculate and log the estimated completion time
 with ProcessPoolExecutor(max_workers=num_workers) as executor:
-    for completed_id in executor.map(run_lorenz_cycle, system_ids):
-        completed_cases += 1
-        logging.info(f"Completed {completed_cases}/{len(system_ids)} cases (ID {completed_id})")
+    for idx, completed_id in enumerate(executor.map(run_lorenz_cycle, system_ids), 1):
+        current_time = time.time()
+        elapsed_time = current_time - overall_start_time
+        average_time_per_system = elapsed_time / idx
+        estimated_total_time = average_time_per_system * len(system_ids)
+        estimated_completion_time = overall_start_time + estimated_total_time
+        formatted_estimated_completion_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(estimated_completion_time))
+        
+        logging.info(f"Completed {idx}/{len(system_ids)} cases (ID {completed_id}). Estimated completion time: {formatted_estimated_completion_time}")
         
 end_time = time.time()
 formatted_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end_time))
