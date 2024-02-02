@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/02 13:59:49 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/02 14:00:23 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,7 +51,7 @@ def get_cdsapi_keys():
     list: A list of filenames matching the pattern.
     """
     home_dir = os.path.expanduser('~')
-    pattern = os.path.join(home_dir, 'cdsapirc-*')
+    pattern = os.path.join(home_dir, '.cdsapirc-*')
     print(f"Current directory: {os.getcwd()}")
     files = glob.glob(pattern)
     print(f"Files matching pattern '{pattern}': {files}")
