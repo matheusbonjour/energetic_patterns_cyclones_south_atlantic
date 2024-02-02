@@ -6,15 +6,17 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/22 13:52:26 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/02 11:33:20 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/02 13:12:53 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
+import sys
 import os
 import glob
 import subprocess
 import time
 import logging
+import random
 import pandas as pd
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor
@@ -22,14 +24,11 @@ from datetime import datetime
 
 overall_start_time = time.time()
 
-
-FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv'
-REGION = 'ARG'
+REGION = sys.argv[1] # Region to process
+FILTERED_TRACKS = '../tracks_SAt_filtered/tracks_SAt_filtered.csv' # Path to filtered tracks
 LEC_PATH = os.path.abspath('../../lorenz-cycle/lorenz_cycle.py')  # Get absolute path
 LEC_RESULTS_DIR = os.path.abspath('../../LEC_Results')  # Get absolute PATH
-
-CDSAPI_PATH = os.path.expanduser('~/.cdsapi')
-SUBPROCESS_BATCH_SIZE = 50  # Number of subprocesses after which to switch .cdsapi file
+CDSAPIRC_PATH = os.path.expanduser('~/.cdsapirc')
 
 def count_evaluated_systems():
     """
@@ -46,30 +45,30 @@ def count_evaluated_systems():
 
 def get_cdsapi_keys():
     """
-    Lists all files in the home directory that match the pattern 'cdsapi-*'.
+    Lists all files in the home directory that match the pattern 'cdsapirc-*'.
 
     Returns:
     list: A list of filenames matching the pattern.
     """
     home_dir = os.path.expanduser('~')
-    pattern = os.path.join(home_dir, 'cdsapi-*')
+    pattern = os.path.join(home_dir, 'cdsapirc-*')
     files = glob.glob(pattern)
     # Extract file suffixes from the full paths
     suffixes = [os.path.basename(file) for file in files]
     return suffixes
 
-def copy_cdsapi(suffix):
+def copy_cdsapirc(suffix):
     """
-    Copies a specific .cdsapi file to the default .cdsapi location.
+    Copies a specific .cdsapirc file to the default .cdsapirc location.
     Args:
     suffix (str): The suffix of the .cdsapi file to be copied.
     """
     try:
         source_path = os.path.expanduser(f'~/{suffix}')
-        subprocess.run(['cp', source_path, CDSAPI_PATH], check=True)
-        logging.info(f"Copied {source_path} to {CDSAPI_PATH}")
+        subprocess.run(['cp', source_path, CDSAPIRC_PATH], check=True)
+        logging.info(f"Copied {source_path} to {CDSAPIRC_PATH}")
     except Exception as e:
-        logging.error(f"Error copying {source_path} to {CDSAPI_PATH}: {e}")
+        logging.error(f"Error copying {source_path} to {CDSAPIRC_PATH}: {e}")
 
 
 def prepare_track_data(system_id):
@@ -115,11 +114,13 @@ def run_lorenz_cycle(id):
         logging.info(f"Results already exist for system ID {id}, skipping.")
         return id
 
-    # Switch .cdsapi file for every SUBPROCESS_BATCH_SIZE subprocesses
-    if subprocess_counter % SUBPROCESS_BATCH_SIZE == 0:
-        suffix_index = (subprocess_counter // SUBPROCESS_BATCH_SIZE - 1) % len(CDSAPI_SUFFIXES)
-        copy_cdsapi(CDSAPI_SUFFIXES[suffix_index])
-        logging.info(f"Switched .cdsapi file to {CDSAPI_SUFFIXES[suffix_index]}")
+    # Pick a random .cdsapirc file for each process
+    if CDSAPIRC_SUFFIXES:
+        chosen_suffix = random.choice(CDSAPIRC_SUFFIXES)
+        copy_cdsapirc(chosen_suffix)
+        logging.info(f"Switched .cdsapirc file to {chosen_suffix}")
+    else:
+        logging.error("No .cdsapirc files found. Please check the configuration.")
 
     input_track_path = prepare_track_data(id)
     if input_track_path:
@@ -135,8 +136,7 @@ def run_lorenz_cycle(id):
 
     return id
 
-
-CDSAPI_SUFFIXES = get_cdsapi_keys()
+CDSAPIRC_SUFFIXES = get_cdsapi_keys()
 
 # Initialize subprocess_counter with the number of already evaluated systems
 subprocess_counter = count_evaluated_systems()
@@ -176,7 +176,11 @@ logging.info(f"Using {num_workers} CPU cores")
 # Process each system ID in parallel and log progress
 start_time = time.time()
 formatted_start_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(start_time))
-logging.info(f"Starting {len(system_ids)} cases at {formatted_start_time}")
+total_systems_count = len(system_ids)
+remaining_systems_count = total_systems_count - subprocess_counter
+logging.info(f"Starting {total_systems_count} cases at {formatted_start_time}")
+logging.info(f"{subprocess_counter} cases already evaluated")
+logging.info(f"{remaining_systems_count} cases remaining to be evaluated")
 
 # Inside the loop, after processing each system, calculate and log the estimated completion time
 with ProcessPoolExecutor(max_workers=num_workers) as executor:
@@ -184,11 +188,11 @@ with ProcessPoolExecutor(max_workers=num_workers) as executor:
         current_time = time.time()
         elapsed_time = current_time - overall_start_time
         average_time_per_system = elapsed_time / idx
-        estimated_total_time = average_time_per_system * len(system_ids)
+        estimated_total_time = average_time_per_system * (remaining_systems_count - idx)
         estimated_completion_time = overall_start_time + estimated_total_time
         formatted_estimated_completion_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(estimated_completion_time))
         
-        logging.info(f"Completed {idx}/{len(system_ids)} cases (ID {completed_id}). Estimated completion time: {formatted_estimated_completion_time}")
+        logging.info(f"Completed {idx}/{total_systems_count} cases (ID {completed_id}). Estimated completion time: {formatted_estimated_completion_time}")
         
 end_time = time.time()
 formatted_end_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(end_time))
