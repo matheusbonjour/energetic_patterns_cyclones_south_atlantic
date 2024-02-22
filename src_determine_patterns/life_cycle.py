@@ -91,14 +91,26 @@ def plot_barplot(df, title_suffix, output_directory, filename, total_systems, fi
 if __name__ == "__main__":
     base_path = '../database_energy_by_periods'  # Adjust to your directory
     output_directory = '../figures/life_cycle_analysis/'
+    csv_output_directory = '../csv_life_cycle_analysis/'  # Directory to save CSV files
     os.makedirs(output_directory, exist_ok=True)
+    os.makedirs(csv_output_directory, exist_ok=True)  # Ensure CSV output directory exists
 
     # Read life cycles, convert to DataFrame, and filter
     life_cycle_counts = read_life_cycles(base_path)
     life_cycles_df, filtered_life_cycles_df, total_systems = convert_counter_to_df(life_cycle_counts)
 
-    # Call for unfiltered data
+    # Export unfiltered life cycle configurations to CSV
+    unfiltered_csv_path = os.path.join(csv_output_directory, 'all_life_cycles.csv')
+    life_cycles_df.to_csv(unfiltered_csv_path, index=False)
+    print(f"Unfiltered life cycle configurations saved to {unfiltered_csv_path}")
+
+    # Export filtered life cycle configurations to CSV
+    filtered_csv_path = os.path.join(csv_output_directory, 'filtered_life_cycles.csv')
+    filtered_life_cycles_df.to_csv(filtered_csv_path, index=False)
+    print(f"Filtered life cycle configurations (>= 1%) saved to {filtered_csv_path}")
+
+    # Call for unfiltered data plot
     plot_barplot(life_cycles_df, 'All Life Cycle Configurations and Counts', output_directory, 'all_life_cycles_plot.png', total_systems)
 
-    # Call for filtered data (>= 1%)
+    # Call for filtered data (>= 1%) plot
     plot_barplot(filtered_life_cycles_df, 'Filtered Configurations (>= 1%)', output_directory, 'filtered_life_cycles_plot.png', total_systems, filtered=True)
