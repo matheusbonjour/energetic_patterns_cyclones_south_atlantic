@@ -1,8 +1,56 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    life_cycle.py                                      :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/02/22 08:29:32 by daniloceano       #+#    #+#              #
+#    Updated: 2024/02/22 08:30:05 by daniloceano      ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+"""
+Life Cycle Analysis for Cyclone Systems
+
+This script performs an analysis of cyclone life cycle configurations from CSV files. Each CSV file
+is assumed to contain sequential period data for a given cyclone system. The script reads these CSV files,
+counts the occurrences of each unique life cycle configuration, and plots the distributions of these
+configurations. It also filters out configurations that represent less than 1% of the total count for
+a focused analysis on more prevalent life cycles.
+
+Additionally, the script exports two CSV files containing detailed counts and percentages of life cycle
+configurations for both the unfiltered and filtered datasets.
+
+Usage:
+- Ensure the 'base_path' variable points to the directory containing your CSV files with life cycle data.
+- The 'output_directory' should point to where you want to save the generated plots.
+- The 'csv_output_directory' is where the script will save the CSV files with the life cycle counts and percentages.
+
+The script defines the following functions:
+- read_life_cycles: Reads CSV files from the specified directory and counts the life cycle configurations.
+- convert_counter_to_df: Converts the counts of life cycle configurations into a DataFrame and filters out less common configurations.
+- plot_barplot: Generates and saves a bar plot for the life cycle configurations.
+
+After setting the directory paths, the script will automatically read the CSV files, perform the analysis,
+generate plots, and export the CSV summaries when executed.
+
+Requirements:
+- pandas: For data manipulation and analysis.
+- matplotlib and seaborn: For generating plots.
+- collections.Counter: For counting life cycle configurations efficiently.
+
+Outputs:
+- Bar plots for life cycle configurations (unfiltered and filtered).
+- CSV files containing the counts and percentages of life cycle configurations (unfiltered and filtered).
+"""
+
 import os
 import pandas as pd
 from collections import Counter
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 
 def read_life_cycles(base_path):
     """

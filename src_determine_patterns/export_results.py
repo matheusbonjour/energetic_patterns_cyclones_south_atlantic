@@ -6,9 +6,28 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/21 14:53:09 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/21 14:53:10 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/22 08:33:42 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
+"""
+Energy Cycle Analysis for Cyclone Systems
+
+This script is designed to process directories containing results from the Lorenz energy cycle analysis
+of cyclone systems. For each system, it computes average values for specified periods using data from CSV files.
+
+The script operates in parallel across multiple directories, each representing a different cyclone system,
+to efficiently handle a large dataset. The results are then saved as CSV files, with each file containing
+the average values for the different energy terms across the specified periods of a system's life cycle.
+
+Usage:
+- Set the 'base_path' variable to the directory containing subdirectories for each cyclone system.
+- Ensure that each system's subdirectory contains a 'track_results.csv' with energy term data and a 'periods.csv' with specified periods.
+- The script will output CSV files with averages to the 'database_energy_by_periods' directory.
+
+Outputs:
+- A CSV file for each system with the average values of energy terms for specified life cycle periods.
+"""
 
 import os
 import pandas as pd
