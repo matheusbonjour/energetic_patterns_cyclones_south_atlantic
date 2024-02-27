@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/22 08:29:32 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/22 08:30:05 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/02/27 17:38:52 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -104,7 +104,9 @@ def plot_barplot(df, title_suffix, output_directory, filename, total_systems, fi
     df['Type of System'] = df['Type of System'].apply(lambda x: ', '.join(x) if isinstance(x, tuple) else x)
 
     # Replace full phase names with letter codes
-    letter_codes = {'incipient': 'Ic', 'intensification': 'It', 'mature': 'M', 'decay': 'D'}
+    letter_codes = {'incipient': 'Ic', 'intensification': 'It', 'mature': 'M', 'decay': 'D',
+                    'incipient 2': 'Ic2', 'intensification 2': 'It2', 'mature 2': 'M2', 'decay 2': 'D2',
+                    'residual': 'R'}
     df['Type of System'] = df['Type of System'].apply(
         lambda x: ', '.join([letter_codes.get(phase.strip(), phase.strip()) for phase in x.split(',')])
     )
