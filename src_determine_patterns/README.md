@@ -13,3 +13,8 @@ This directory is dedicated to the analysis of energetic patterns within cycloni
 **Output**: 
 - Bar plots illustrating the distribution of life cycle configurations, saved in the `figures/life_cycle_analysis` directory.
 - CSV summary files of life cycle configuration counts and percentages, stored alongside the plots.
+
+### `plot_lps.py`
+**Purpose**: Visualizes the energetic data of cyclonic systems in the Lorenz Phase Space, highlighting the dynamic interactions between different energetic components.
+**Output**:
+- A composite Lorenz Phase Space diagram with data from all analyzed cyclonic systems, showcasing the energetics' evolution through their life cycles. The diagram is saved in the `figures/lps/` directory.
