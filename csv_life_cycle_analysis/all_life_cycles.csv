@@ -1,45 +1,45 @@
 Type of System,Total Count,Percentage
-"('incipient', 'intensification', 'mature', 'decay')",3290,48.46074532331713
-"('incipient', 'decay', 'intensification')",128,1.885402857563706
-"('incipient', 'intensification', 'mature', 'decay', 'residual')",347,5.111209309176609
-"('decay',)",108,1.5908086610693768
-"('intensification',)",273,4.021210782147592
-"('incipient', 'decay', 'intensification', 'decay 2')",204,3.0048608042421563
-"('incipient', 'intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2')",179,2.636618058624245
 "('intensification', 'mature', 'decay')",385,5.670938282515834
+"('incipient', 'intensification', 'mature', 'decay')",3290,48.46074532331713
+"('incipient', 'intensification', 'decay', 'intensification 2', 'decay 2')",46,0.6775666519369569
+"('incipient', 'intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2')",179,2.636618058624245
+"('decay', 'intensification', 'mature', 'decay 2')",112,1.6497275003682428
 "('intensification', 'decay')",697,10.266607747827369
-"('incipient', 'decay', 'intensification', 'mature', 'decay 2')",155,2.28310502283105
-"('decay', 'intensification', 'decay 2')",203,2.99013109441744
-"('decay', 'intensification')",93,1.36986301369863
 "('intensification', 'mature', 'decay', 'residual')",102,1.5024304021210781
+"('incipient', 'decay', 'intensification', 'mature', 'decay 2')",155,2.28310502283105
+"('intensification',)",273,4.021210782147592
+"('incipient', 'decay', 'intensification')",128,1.885402857563706
+"('decay', 'intensification', 'decay 2')",203,2.99013109441744
+"('incipient', 'intensification', 'mature', 'decay', 'residual')",347,5.111209309176609
+"('incipient', 'intensification', 'decay', 'intensification 2', 'mature', 'decay 2')",34,0.5008101340403595
+"('decay',)",108,1.5908086610693768
+"('incipient', 'decay', 'intensification', 'decay 2', 'intensification 2')",3,0.04418912947414936
+"('intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2')",115,1.693916629842392
+"('decay', 'intensification')",93,1.36986301369863
 "('intensification', 'residual')",24,0.3535130357931949
 "('incipient', 'intensification', 'decay', 'intensification 2')",128,1.885402857563706
-"('incipient', 'intensification', 'decay', 'intensification 2', 'decay 2')",46,0.6775666519369569
-"('intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2')",115,1.693916629842392
+"('incipient', 'decay', 'intensification', 'decay 2')",204,3.0048608042421563
 "('decay', 'intensification', 'decay 2', 'intensification 2')",29,0.42716158491677714
-"('decay', 'intensification', 'mature', 'decay 2', 'residual')",14,0.20621593754603035
-"('decay', 'intensification', 'mature', 'decay 2')",112,1.6497275003682428
-"('incipient', 'decay')",31,0.45662100456621
-"('intensification', 'decay', 'residual')",29,0.42716158491677714
-"('incipient', 'intensification', 'decay', 'intensification 2', 'residual')",8,0.11783767859773163
-"('incipient', 'intensification', 'decay', 'intensification 2', 'mature', 'decay 2')",34,0.5008101340403595
-"('incipient', 'intensification', 'decay')",2,0.029459419649432907
-"('incipient', 'intensification', 'residual')",1,0.014729709824716454
-"('decay', 'intensification', 'residual')",6,0.08837825894829872
 "('decay', 'residual')",4,0.058918839298865815
-"('incipient', 'decay', 'intensification', 'decay 2', 'intensification 2')",3,0.04418912947414936
-"('incipient', 'decay', 'residual')",4,0.058918839298865815
-"('incipient', 'decay', 'intensification', 'residual')",2,0.029459419649432907
-"('intensification', 'incipient', 'decay')",4,0.058918839298865815
-"('incipient', 'decay', 'intensification', 'mature', 'decay 2', 'residual')",5,0.07364854912358226
 "('incipient', 'decay', 'intensification', 'decay 2', 'residual')",4,0.058918839298865815
-"('incipient', 'decay', 'intensification', 'mature', 'decay 2', 'intensification 2', 'mature 2')",1,0.014729709824716454
-"('decay', 'intensification', 'residual', 'intensification 2')",1,0.014729709824716454
+"('intensification', 'decay', 'residual')",29,0.42716158491677714
+"('decay', 'intensification', 'residual')",6,0.08837825894829872
+"('incipient', 'decay')",31,0.45662100456621
+"('incipient', 'intensification', 'decay', 'intensification 2', 'residual')",8,0.11783767859773163
+"('intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2', 'residual')",2,0.029459419649432907
+"('decay', 'intensification', 'incipient', 'decay 2')",1,0.014729709824716454
+"('decay', 'intensification', 'decay 2', 'residual')",5,0.07364854912358226
 "('incipient', 'intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2', 'residual')",4,0.058918839298865815
+"('decay', 'intensification', 'mature', 'decay 2', 'residual')",14,0.20621593754603035
+"('incipient', 'decay', 'intensification', 'residual')",2,0.029459419649432907
 "('incipient', 'intensification')",3,0.04418912947414936
 "('incipient', 'decay', 'intensification', 'incipient 2', 'decay 2')",1,0.014729709824716454
-"('decay', 'intensification', 'decay 2', 'residual')",5,0.07364854912358226
+"('incipient', 'intensification', 'decay')",2,0.029459419649432907
+"('incipient', 'decay', 'intensification', 'mature', 'decay 2', 'residual')",5,0.07364854912358226
+"('intensification', 'incipient', 'decay')",4,0.058918839298865815
 "('incipient', 'decay', 'intensification', 'decay 2', 'intensification 2', 'mature')",1,0.014729709824716454
-"('intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2', 'residual')",2,0.029459419649432907
+"('incipient', 'decay', 'residual')",4,0.058918839298865815
 "('incipient', 'intensification', 'decay', 'intensification 2', 'mature', 'decay 2', 'residual')",1,0.014729709824716454
-"('decay', 'intensification', 'incipient', 'decay 2')",1,0.014729709824716454
+"('incipient', 'intensification', 'residual')",1,0.014729709824716454
+"('decay', 'intensification', 'residual', 'intensification 2')",1,0.014729709824716454
+"('incipient', 'decay', 'intensification', 'mature', 'decay 2', 'intensification 2', 'mature 2')",1,0.014729709824716454

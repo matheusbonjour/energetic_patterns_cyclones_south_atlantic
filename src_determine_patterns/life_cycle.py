@@ -6,43 +6,42 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/22 08:29:32 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/27 17:38:52 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/01 14:16:10 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 """
-Life Cycle Analysis for Cyclone Systems
+Life Cycle Analysis for Cyclonic Systems
 
-This script performs an analysis of cyclone life cycle configurations from CSV files. Each CSV file
-is assumed to contain sequential period data for a given cyclone system. The script reads these CSV files,
-counts the occurrences of each unique life cycle configuration, and plots the distributions of these
-configurations. It also filters out configurations that represent less than 1% of the total count for
-a focused analysis on more prevalent life cycles.
+This script is dedicated to analyzing the life cycle configurations of cyclonic systems in the Southern Atlantic, utilizing data from CSV files. Each file is expected to contain sequential period data for individual cyclonic systems. The script processes these files to identify and count unique life cycle configurations, visualizes the distribution of these configurations, and applies filtering to focus on the more significant life cycles.
 
-Additionally, the script exports two CSV files containing detailed counts and percentages of life cycle
-configurations for both the unfiltered and filtered datasets.
+Key features of this script include:
+- Counting occurrences of each unique life cycle configuration from the CSV data.
+- Filtering configurations to highlight those that are most prevalent, specifically excluding configurations that represent less than 1% of the total.
+- Excluding the 'residual' phase from configurations and summing counts for identical configurations post-'residual' removal, providing a more focused analysis.
 
-Usage:
-- Ensure the 'base_path' variable points to the directory containing your CSV files with life cycle data.
-- The 'output_directory' should point to where you want to save the generated plots.
-- The 'csv_output_directory' is where the script will save the CSV files with the life cycle counts and percentages.
+Additionally, the script exports detailed summaries of life cycle configurations, both before and after applying filters, into CSV files.
 
-The script defines the following functions:
-- read_life_cycles: Reads CSV files from the specified directory and counts the life cycle configurations.
-- convert_counter_to_df: Converts the counts of life cycle configurations into a DataFrame and filters out less common configurations.
-- plot_barplot: Generates and saves a bar plot for the life cycle configurations.
+Usage Guidelines:
+- Set the 'base_path' variable to the directory containing your CSV files with life cycle data.
+- Designate 'output_directory' for storing generated plot images.
+- Use 'csv_output_directory' to specify where the CSV summaries of life cycle counts and percentages should be saved.
 
-After setting the directory paths, the script will automatically read the CSV files, perform the analysis,
-generate plots, and export the CSV summaries when executed.
+The script includes several functions:
+- `read_life_cycles`: Extracts life cycle configurations from CSV files within the specified directory and counts their occurrences.
+- `convert_counter_to_df`: Transforms the life cycle configuration counts into a DataFrame, applies filters to exclude less common configurations, and additionally filters out the 'residual' phase.
+- `plot_barplot`: Creates and saves bar plots visualizing the life cycle configurations, for both the original and filtered datasets.
 
-Requirements:
-- pandas: For data manipulation and analysis.
-- matplotlib and seaborn: For generating plots.
-- collections.Counter: For counting life cycle configurations efficiently.
+Upon execution, the script reads the provided CSV files, carries out the analysis, generates visual plots, and exports the CSV summaries.
+
+Dependencies:
+- pandas: Utilized for data handling and analysis.
+- matplotlib and seaborn: Employed for plot generation.
+- collections.Counter: Facilitates efficient counting of life cycle configurations.
 
 Outputs:
-- Bar plots for life cycle configurations (unfiltered and filtered).
-- CSV files containing the counts and percentages of life cycle configurations (unfiltered and filtered).
+- Bar plots illustrating the distribution of life cycle configurations, both before and after filtering, are saved in the designated `output_directory`.
+- CSV files detailing the counts and percentages of life cycle configurations, for both unfiltered and filtered datasets, are stored in `csv_output_directory`.
 """
 
 import os
@@ -90,11 +89,18 @@ def convert_counter_to_df(life_cycles):
     life_cycles_df['Percentage'] = (life_cycles_df['Total Count'] / total_systems) * 100
     
     # Filter out configurations under 1%
-    filtered_df = life_cycles_df[life_cycles_df['Percentage'] >= 1].copy()
-    filtered_df['Type of System'] = filtered_df['Type of System'].apply(lambda x: ', '.join(x))
-    filtered_df.sort_values(by='Total Count', ascending=False, inplace=True)
+    most_frequent_life_cycles_df = life_cycles_df[life_cycles_df['Percentage'] >= 1].copy()
+    most_frequent_life_cycles_df['Type of System'] = most_frequent_life_cycles_df['Type of System'].apply(lambda x: ', '.join(x))
+    most_frequent_life_cycles_df.sort_values(by='Total Count', ascending=False, inplace=True)
+    most_frequent_life_cycles_df.index = range(len(most_frequent_life_cycles_df))
+
+    # Filter out residual phase
+    filtered_life_cycles_df = most_frequent_life_cycles_df.copy()
+    filtered_life_cycles_df = filtered_life_cycles_df[~filtered_life_cycles_df['Type of System'].str.contains('residual')]
+    filtered_life_cycles_df.sort_values(by='Total Count', ascending=False, inplace=True)
+    filtered_life_cycles_df.index = range(len(filtered_life_cycles_df))
     
-    return life_cycles_df, filtered_df, total_systems
+    return life_cycles_df, most_frequent_life_cycles_df, filtered_life_cycles_df, total_systems
 
 def plot_barplot(df, title_suffix, output_directory, filename, total_systems, filtered=False):
     """
@@ -139,20 +145,25 @@ def plot_barplot(df, title_suffix, output_directory, filename, total_systems, fi
     print(f"Plot saved to {output_path}")
 
 if __name__ == "__main__":
-    base_path = '../database_energy_by_periods'  # Adjust to your directory
-    output_directory = '../figures/life_cycle_analysis/'
+    base_path = '../csv_database_energy_by_periods'  # Adjust to your directory
+    output_directory = '../figures_life_cycle_analysis/'
     csv_output_directory = '../csv_life_cycle_analysis/'  # Directory to save CSV files
     os.makedirs(output_directory, exist_ok=True)
     os.makedirs(csv_output_directory, exist_ok=True)  # Ensure CSV output directory exists
 
     # Read life cycles, convert to DataFrame, and filter
     life_cycle_counts = read_life_cycles(base_path)
-    life_cycles_df, filtered_life_cycles_df, total_systems = convert_counter_to_df(life_cycle_counts)
+    life_cycles_df, most_frequent_life_cycles_df, filtered_life_cycles_df, total_systems = convert_counter_to_df(life_cycle_counts)
 
     # Export unfiltered life cycle configurations to CSV
     unfiltered_csv_path = os.path.join(csv_output_directory, 'all_life_cycles.csv')
     life_cycles_df.to_csv(unfiltered_csv_path, index=False)
     print(f"Unfiltered life cycle configurations saved to {unfiltered_csv_path}")
+
+    # Export most frequent life cycle configurations to CSV
+    most_frequent_csv_path = os.path.join(csv_output_directory, 'most_frequent_life_cycles.csv')
+    most_frequent_life_cycles_df.to_csv(most_frequent_csv_path, index=False)
+    print(f"Most frequent life cycle configurations (>= 1%) saved to {most_frequent_csv_path}")
 
     # Export filtered life cycle configurations to CSV
     filtered_csv_path = os.path.join(csv_output_directory, 'filtered_life_cycles.csv')
@@ -162,5 +173,8 @@ if __name__ == "__main__":
     # Call for unfiltered data plot
     plot_barplot(life_cycles_df, 'All Life Cycle Configurations and Counts', output_directory, 'all_life_cycles_plot.png', total_systems)
 
-    # Call for filtered data (>= 1%) plot
-    plot_barplot(filtered_life_cycles_df, 'Filtered Configurations (>= 1%)', output_directory, 'filtered_life_cycles_plot.png', total_systems, filtered=True)
+    # Call for most frequent data (>= 1%) plot
+    plot_barplot(most_frequent_life_cycles_df, 'MOst Frequent Configurations (>= 1%)', output_directory, 'most_frequent_life_cycles_plot.png', total_systems, filtered=True)
+
+    # Call for filtered data (without residual) plot
+    plot_barplot(filtered_life_cycles_df, 'Filtered Configurations (>= 1% and without Residual)', output_directory, 'filtered_life_cycles_plot.png', total_systems, filtered=True)
