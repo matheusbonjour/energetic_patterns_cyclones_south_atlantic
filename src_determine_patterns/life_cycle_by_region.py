@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/01 15:35:50 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/01 16:11:04 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/01 16:21:38 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,7 +46,7 @@ def filter_life_cycles_by_region(base_path, region_ids):
                 
     return life_cycles_by_region
 
-def plot_barplot_by_region(life_cycles_by_region, output_directory, total_system_count):
+def plot_barplot_by_region(life_cycles_by_region, output_directory, total_system_count, region_system_count_df):
     """
     Generates bar plots for life cycle configurations by genesis region.
     """
@@ -58,8 +58,10 @@ def plot_barplot_by_region(life_cycles_by_region, output_directory, total_system
 
     for region, life_cycles in life_cycles_by_region.items():
         # Prepare DataFrame and calculate percentage
+        region_system_count = region_system_count_df.loc[region, 'Total Systems']
+
         df = pd.DataFrame.from_records([(x, y) for x, y in life_cycles.items()], columns=['Type of System', 'Total Count'])
-        df['Percentage'] = (df['Total Count'] / df['Total Count'].sum()) * 100
+        df['Percentage'] = (df['Total Count'] / region_system_count) * 100
         df = df[df['Percentage'] >= 1]  # Filter out configurations with less than 1%
         
         df['Type of System'] = df['Type of System'].apply(lambda x: ', '.join([letter_codes.get(phase, phase) for phase in x]))
@@ -91,7 +93,7 @@ if __name__ == "__main__":
     region_ids = read_region_system_ids(region_dir)
     life_cycles_by_region = filter_life_cycles_by_region(base_path, region_ids)
 
-    region_system_count
+    region_system_count_df = pd.read_csv(os.path.join(region_dir, 'genesis_region_summary.csv'), index_col=0)
 
     total_system_count = sum(len(ids) for ids in region_ids.values())  # Calculate the total number of systems across all regions
-    plot_barplot_by_region(life_cycles_by_region, output_directory, total_system_count)
+    plot_barplot_by_region(life_cycles_by_region, output_directory, total_system_count, region_system_count_df)
