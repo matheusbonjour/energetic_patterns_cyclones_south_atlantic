@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/22 08:29:32 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/01 14:16:10 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/01 14:21:30 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -122,7 +122,7 @@ def plot_barplot(df, title_suffix, output_directory, filename, total_systems, fi
 
     # Plot configuration
     plt.figure(figsize=(10, len(df) * 0.5))
-    bar_plot = sns.barplot(x='Total Count', y='Type of System', data=df, palette='pastel')
+    bar_plot = sns.barplot(x='Total Count', y='Type of System', data=df, palette='pastel', hue='Type of System')
 
     # Annotate each bar with the count and percentage
     for index, (count, pct) in enumerate(zip(df['Total Count'], df['Percentage'])):
@@ -168,13 +168,13 @@ if __name__ == "__main__":
     # Export filtered life cycle configurations to CSV
     filtered_csv_path = os.path.join(csv_output_directory, 'filtered_life_cycles.csv')
     filtered_life_cycles_df.to_csv(filtered_csv_path, index=False)
-    print(f"Filtered life cycle configurations (>= 1%) saved to {filtered_csv_path}")
+    print(f"Filtered life cycle configurations (>= 1% and without Residual) saved to {filtered_csv_path}")
 
     # Call for unfiltered data plot
     plot_barplot(life_cycles_df, 'All Life Cycle Configurations and Counts', output_directory, 'all_life_cycles_plot.png', total_systems)
 
     # Call for most frequent data (>= 1%) plot
-    plot_barplot(most_frequent_life_cycles_df, 'MOst Frequent Configurations (>= 1%)', output_directory, 'most_frequent_life_cycles_plot.png', total_systems, filtered=True)
+    plot_barplot(most_frequent_life_cycles_df, 'Most Frequent Configurations (>= 1%)', output_directory, 'most_frequent_life_cycles_plot.png', total_systems, filtered=True)
 
     # Call for filtered data (without residual) plot
     plot_barplot(filtered_life_cycles_df, 'Filtered Configurations (>= 1% and without Residual)', output_directory, 'filtered_life_cycles_plot.png', total_systems, filtered=True)
