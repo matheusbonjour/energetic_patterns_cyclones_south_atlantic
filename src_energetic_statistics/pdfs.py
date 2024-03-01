@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/29 14:56:47 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/29 20:39:47 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/01 11:51:27 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -230,8 +230,8 @@ def plot_rigde_overlapping(systems_energetics, group_name, terms_prefix, output_
         print(f"Saved {plot_filename} in {output_directory}")
     
 if __name__ == "__main__":
-    base_path = '../database_energy_by_periods'
-    output_directory = '../figures/statistics_energetics/'
+    base_path = '../csv_database_energy_by_periods'
+    output_directory = '../figures_statistics_energetics/'
     os.makedirs(output_directory, exist_ok=True)
 
     systems_energetics = read_life_cycles(base_path)

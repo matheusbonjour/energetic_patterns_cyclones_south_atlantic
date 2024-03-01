@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/27 17:45:49 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/28 22:34:25 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/01 11:50:52 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -68,7 +68,7 @@ def determine_global_limits(systems_energetics):
 
 if __name__ == "__main__":
     base_path = '../database_energy_by_periods'
-    output_directory = '../figures/lps/'
+    output_directory = '../figures_lps/'
     os.makedirs(output_directory, exist_ok=True)
 
     # Initialize the Lorenz Phase Space plotter
