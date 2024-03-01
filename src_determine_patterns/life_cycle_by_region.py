@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/01 15:35:50 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/01 16:21:38 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/01 16:29:53 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,7 +46,7 @@ def filter_life_cycles_by_region(base_path, region_ids):
                 
     return life_cycles_by_region
 
-def plot_barplot_by_region(life_cycles_by_region, output_directory, total_system_count, region_system_count_df):
+def plot_barplot_by_region(life_cycles_by_region, output_directory, csv_output_directory, total_system_count, region_system_count_df):
     """
     Generates bar plots for life cycle configurations by genesis region.
     """
@@ -54,6 +54,12 @@ def plot_barplot_by_region(life_cycles_by_region, output_directory, total_system
         'incipient': 'Ic', 'intensification': 'It', 'mature': 'M', 'decay': 'D',
         'incipient 2': 'Ic2', 'intensification 2': 'It2', 'mature 2': 'M2', 'decay 2': 'D2',
         'residual': 'R'
+    }
+
+    reverse_letter_codes = {
+        'Ic': 'incipient', 'It': 'intensification', 'M': 'mature', 'D': 'decay',
+        'Ic2': 'incipient 2', 'It2': 'intensification 2', 'M2': 'mature 2', 'D2': 'decay 2',
+        'R': 'residual'
     }
 
     for region, life_cycles in life_cycles_by_region.items():
@@ -84,10 +90,20 @@ def plot_barplot_by_region(life_cycles_by_region, output_directory, total_system
         plt.close()
         print(f"Plot saved for {region} in {plot_path}")
 
+        # Save the DataFrame to a CSV file for each region
+        # Revert the letter codes back to their original phase names for CSV export
+        df['Type of System'] = df['Type of System'].apply(
+            lambda x: ', '.join([reverse_letter_codes.get(phase, phase) for phase in x.split(', ')]))
+        csv_filename = f"{region}_life_cycle_configurations.csv"
+        df.to_csv(os.path.join(csv_output_directory, csv_filename), index=False)
+        print(f"Life cycle configurations for {region} saved to {csv_filename}")
+
+
 if __name__ == "__main__":
     base_path = '../csv_database_energy_by_periods'
     region_dir = '../csv_life_cycle_analysis'
     output_directory = '../figures_life_cycle_analysis'
+    csv_output_directory = '../csv_life_cycle_analysis/'  # Directory to save CSV files
     os.makedirs(output_directory, exist_ok=True)
     
     region_ids = read_region_system_ids(region_dir)
@@ -96,4 +112,4 @@ if __name__ == "__main__":
     region_system_count_df = pd.read_csv(os.path.join(region_dir, 'genesis_region_summary.csv'), index_col=0)
 
     total_system_count = sum(len(ids) for ids in region_ids.values())  # Calculate the total number of systems across all regions
-    plot_barplot_by_region(life_cycles_by_region, output_directory, total_system_count, region_system_count_df)
+    plot_barplot_by_region(life_cycles_by_region, output_directory, csv_output_directory, total_system_count, region_system_count_df)
