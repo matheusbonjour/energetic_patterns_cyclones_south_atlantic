@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/02 17:31:28 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/02 18:10:18 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/02 18:11:23 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -22,7 +22,7 @@ def read_life_cycles(base_path):
     """
     systems_energetics = {}
     
-    for filename in tqdm(os.listdir(base_path)[:100], desc="Reading CSV files"):
+    for filename in tqdm(os.listdir(base_path), desc="Reading CSV files"):
         if filename.endswith('.csv'):
             file_path = os.path.join(base_path, filename)
             system_id = filename.split('_')[0]
