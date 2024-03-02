@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/02 17:31:28 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/02 18:11:23 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/02 18:32:27 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,6 +15,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
+
+COLOR_PHASES = {
+    'Total': 'grey',
+    'incipient': '#65a1e6',
+    'intensification': '#f7b538',
+    'mature': '#d62828',
+    'decay': '#9aa981',
+    'intensification 2': '#ca6702',
+    'mature 2': '#9b2226',
+    'decay 2': '#386641',
+    }
 
 def read_life_cycles(base_path):
     """
@@ -55,8 +66,10 @@ def plot_box_plots_by_phase(systems_energetics, output_directory):
     
     for term in terms:
         plt.figure(figsize=(10, 6))
-        sns.boxplot(x='phase', y=term, data=all_data, order=['incipient', 'intensification', 'mature', 'decay',
-                                                             'intensification 2', 'mature 2', 'decay 2', 'Total'])
+        sns.boxplot(x='phase', y=term, data=all_data, palette=COLOR_PHASES.values(),
+                     order=['Total', 'incipient', 'intensification', 'mature', 'decay',
+                                                             'intensification 2', 'mature 2', 'decay 2'])
+        plt.axhline(y=0, color='k', linestyle='--', alpha=0.8, linewidth=0.5)
         plt.title(f'Statistics of {term} by Phase')
         plt.ylabel(f'{term} Value')
         plt.xlabel('Life Cycle Phase')
