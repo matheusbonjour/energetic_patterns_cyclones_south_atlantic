@@ -6,13 +6,14 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/02 23:13:30 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/02 23:13:55 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/02 23:25:39 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import os
 import pandas as pd
 import seaborn as sns
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 def read_and_average_data(base_path):
@@ -24,7 +25,8 @@ def read_and_average_data(base_path):
             filepath = os.path.join(base_path, filename)
             try:
                 df = pd.read_csv(filepath)
-                # Assuming the first column indicates the phase and the rest are terms
+                # Rename columns that match the specific pattern
+                df.columns = [col.replace(' (finite diff.)', '') if '∂' in col else col for col in df.columns]
                 mean_values = df.drop(columns=df.columns[0]).mean()
                 all_means.append(mean_values)
             except Exception as e:
@@ -39,14 +41,14 @@ def plot_correlation_clustermap(df_means, output_filepath):
     # Calculate the correlation matrix
     corr = df_means.corr()
 
-    # Optional: If you have a categorical variable to differentiate term groups, create a color palette and mapping
-
-    # Draw the clustermap
+    # Draw the clustermap with updated label sizes
     g = sns.clustermap(corr, center=0, cmap="vlag",
                        dendrogram_ratio=(.1, .2),
                        cbar_pos=(.02, .32, .03, .2),
                        linewidths=.75, figsize=(12, 13))
     g.ax_row_dendrogram.remove()
+    plt.setp(g.ax_heatmap.get_xticklabels(), rotation=45, ha="right", fontsize=10)
+    plt.setp(g.ax_heatmap.get_yticklabels(), fontsize=10)
 
     # Save the plot
     g.savefig(output_filepath)
