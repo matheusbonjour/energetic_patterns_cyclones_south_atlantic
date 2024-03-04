@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/03 16:49:11 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/03 19:16:07 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/04 14:46:09 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -50,8 +50,23 @@ def compute_eofs(df, output_directory):
     phases = ['incipient', 'intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2', 'Total']
 
     for phase in phases:
+        # Get data for the current phase
         phase_df = df[df['Phase'] == phase].drop(columns=['Phase', 'system_id'])
-        solver = Eof(phase_df.values)
+
+        # Step 1: Compute sample mean
+        sample_mean = phase_df.mean(axis=0)
+        
+        # Step 2: Subtract sample mean to obtain anomalies
+        anomalies = phase_df - sample_mean
+        
+        # Step 3: Compute standard deviation
+        std_deviation = phase_df.std(axis=0)
+        
+        # Step 4: Normalize by dividing by standard deviation
+        normalized_anomalies = anomalies / std_deviation
+
+        # Compute EOFs
+        solver = Eof(normalized_anomalies.values)
 
         # Compute EOFs for each term
         eofs = solver.eofsAsCovariance(neofs=3)

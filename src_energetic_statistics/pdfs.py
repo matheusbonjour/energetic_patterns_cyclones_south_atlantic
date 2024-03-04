@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/29 14:56:47 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/02 17:23:16 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/04 11:31:50 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -122,7 +122,7 @@ def plot_ridge_group(systems_energetics, group_name, terms_prefix, output_direct
     plt.axvline(x=0, color='black', linestyle='--')
         
     # Save the plot
-    plot_filename = f'ridge_plot_{group_name}.png'
+    plot_filename = f'ridge_plot_{group_name.replace(" ", "_").replace("/", "_")}.png'
     plot_path = os.path.join(output_directory, plot_filename)
     plt.savefig(plot_path)
     plt.close()
@@ -167,8 +167,8 @@ def plot_ridge_group_phases(systems_energetics, group_name, terms_prefix, output
         
         # Adjust filename for Budget terms
         filename_term = term if group_name != 'Budgets' else f'budget_{term.split("/")[0].split("∂")[1]}'
-        plot_filename = f'ridge_plot_{group_name}_{filename_term}.png'.replace('/', '')  # Remove slashes from filenames
-        plot_filename = plot_filename.replace(' ', '_')
+        plot_filename = f'ridge_plot_{group_name.replace("/", "_")}_{filename_term}.png'.replace('/', '')  # Remove slashes from filenames
+        plot_filename = plot_filename.replace('/', '_')
         plot_path = os.path.join(output_directory, plot_filename)
         plt.savefig(plot_path)
         plt.close()
@@ -241,7 +241,7 @@ if __name__ == "__main__":
         'Energy Terms': ['A', 'K'],
         'Conversion Terms': ['C'],
         'Boundary Terms': ['B'],
-        'Residuals': ['R'],
+        'Generation/Dissipation Terms': ['G', 'R'],
         'Budgets': ['∂']
     }
 

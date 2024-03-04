@@ -152,7 +152,7 @@ def BKz_BKe(ax,value,i,width,head_width):
     ax.text(1.18,0.5,value,fontdict={'fontsize':fs},transform=ax.transAxes,
             verticalalignment='center',horizontalalignment='left')
 
-def plot_LEC(idata, flag, output_directory, period=False):
+def plot_LEC(idata, title, flag, output_directory, period=False):
     
 
     # Adjust arrow size proportionally to the conversion rate, residual and 
@@ -167,15 +167,8 @@ def plot_LEC(idata, flag, output_directory, period=False):
     gs = gridspec.GridSpec(nrows=2, ncols=2,hspace=0.5,wspace=0.5,
                            right=(0.89))
     
-    if flag == 'example':
-        plt.title('(Daily mean/period)',fontsize=fs, loc='center',y=0.5,
+    plt.title(title,fontsize=fs, loc='center',y=0.44,
                   fontdict={'fontweight':'bold'})
-    elif flag == 'daily_mean':
-        plt.title(str(idata.name.date()),fontsize=fs, loc='center',y=0.5,
-              fontdict={'fontweight':'bold'})
-    elif flag == 'periods':
-        plt.title(period,fontsize=fs, loc='center',y=0.5,
-               fontdict={'fontweight':'bold'})
     
     i = 0
     for row in range(2):
@@ -259,25 +252,30 @@ def main():
     for phase in phases:
 
         # Read dummy results in order to get the columns
-        phase_directory = os.path.join(results_path, phase)
-        results = glob(phase_directory+'/*.csv')
+        results = glob(results_path+'/*.csv')
         dummy_result = pd.read_csv(results[0], index_col=0)
         columns = dummy_result.columns
 
         # Load the DataFrame with EOF values
-        eof_file = os.path.join(eofs_path, 'eofs.csv')
-        df = pd.read_csv(eof_file, header=None)
+        phase_directory = os.path.join(eofs_path, phase)
+        eof_file_phase = os.path.join(phase_directory, 'eofs.csv')
+        df = pd.read_csv(eof_file_phase, header=None)
 
         # Set the columns of df to be equal to the columns variable
         df.columns = columns
 
+        # Load explained variance
+        explained_variance = pd.read_csv(os.path.join(phase_directory, 'variance_fraction.csv'), header=None)
+
         # plot example figure
-        plot_LEC(df, 'example', output_directory)
+        plot_LEC(df, '(Daily mean/period)', 'example', output_directory)
 
         # plot each deaily mean
         for eof in range(len(df)):
             idata = df.iloc[eof]
-            plot_LEC(idata, 'periods', output_directory,  period=f'eof_{eof+1}_all_periods')
+            explained_variance_eof_percentage = round(float(explained_variance.iloc[eof].values[0] * 100), 2)
+            title = f'\nEOF {eof+1}\n{phase.capitalize()}\nExp. Var.: {explained_variance_eof_percentage}%'
+            plot_LEC(idata, title, 'periods', output_directory,  period=f'eof_{eof+1}_{phase}')
 
 if __name__ == "__main__":
     
