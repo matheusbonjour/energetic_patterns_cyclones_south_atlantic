@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/27 17:45:49 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/01 12:49:07 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/04 09:54:39 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -235,10 +235,10 @@ if __name__ == "__main__":
     os.makedirs(output_directory, exist_ok=True)
 
     # First: plot all systems
-    # plot_all_systems(base_path, output_directory)
+    plot_all_systems(base_path, output_directory)
 
     # Now, plot just the patterns 
-    # plot_all_patterns(base_path, output_directory)
+    plot_all_patterns(base_path, output_directory)
 
     # Finally, plot clusters for each pattern in distinct plots
     plot_clusters(base_path, output_directory)
