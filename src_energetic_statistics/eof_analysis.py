@@ -6,15 +6,16 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/03/03 16:49:11 by daniloceano       #+#    #+#              #
-#    Updated: 2024/03/04 14:46:09 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/05 09:15:49 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 import os
 import pandas as pd
 import numpy as np
-from eofs.standard import Eof
 from tqdm import tqdm
+from eofs.standard import Eof
+from pyEOF import *
 
 def read_and_prepare_data(base_path):
     all_dfs = []
@@ -66,12 +67,21 @@ def compute_eofs(df, output_directory):
         normalized_anomalies = anomalies / std_deviation
 
         # Compute EOFs
-        solver = Eof(normalized_anomalies.values)
+        # solver = Eof(normalized_anomalies.values)
 
-        # Compute EOFs for each term
-        eofs = solver.eofsAsCovariance(neofs=3)
-        pcs = solver.pcs(npcs=3, pcscaling=1)
-        variance_fraction = solver.varianceFraction(neigs=3)
+        # # Compute EOFs for each term
+        # eofs = solver.eofsAsCovariance(neofs=3)
+        # pcs = solver.pcs(npcs=3, pcscaling=1)
+        # variance_fraction = solver.varianceFraction(neigs=3)
+
+        # Compute EOFs with PyEOF
+        n = 4
+        pca = df_eof(normalized_anomalies, n_components=n)
+        eofs = pca.eofs(s=2, n=n) # get eofs
+        pcs = pca.pcs(s=2, n=n) # get pcs
+        variance_fraction = pca.evf(n=n) # get variance fraction
+
+
 
         # Save EOFs, PCs, and variance fraction to files
         phase_output_directory = os.path.join(output_directory, phase)
