@@ -16,6 +16,10 @@ This directory contains scripts for analyzing and visualizing energetic patterns
 **Description**: Constructs a cluster map to visualize the correlation matrix of all terms, averaged across all phases, with hierarchical clustering applied to group similar terms.
 **Output**: Cluster maps saved in the `../figures_statistics_energetics/` directory.
 
+### `eof_analysis.py`
+**Description**: Computes Empirical Orthogonal Functions (EOFs) for each term across all periods and for each period individually, to identify dominant modes of variability.
+**Output**: EOF analysis results saved in the `../figures_statistics_energetics/eof_analysis/` directory.
+
 ### `heatmaps.py`
 **Description**: Produces annotated heatmaps for each group of terms (Energy, Conversion, Boundary, Residual, and Budget), displaying the average values across all phases.
 **Output**: Heatmaps saved in the `../figures_statistics_energetics/heatmaps/` directory.
@@ -24,9 +28,17 @@ This directory contains scripts for analyzing and visualizing energetic patterns
 **Description**: Creates ridge plots (also known as Joy plots) and overlapping density plots to visualize the distribution of each term across different life cycle phases.
 **Output**: Ridge and density plots saved in the `../figures_statistics_energetics/pdfs/` directory.
 
+### `plot_lec_eofs.py`
+**Description**: Visualizes the leading Empirical Orthogonal Functions (EOFs) derived from the energetic data, offering insights into the principal patterns of variation.
+**Output**: EOF plots saved in the `../figures_statistics_energetics/eof_plots/` directory.
+
+### `time_series_periods.py`
+**Description**: Generates time series plots of the averaged values for each phase, with shaded areas representing the standard deviation. Groups similar terms in one plot.
+**Output**: Time series plots saved in the `../figures_statistics_energetics/time_series/` directory.
+
 ## Usage Instructions
 
-1. Ensure that your CSV files containing the energetic terms for each cyclonic system are placed in the `../csv_database_energy_by_periods/` directory.
+1. Ensure your CSV files containing the energetic terms for each cyclonic system are placed in the `../csv_database_energy_by_periods/` directory.
 2. Run each script individually to generate the visualizations. Each script will automatically read the CSV files, perform the necessary data processing, and save the visualizations to the designated output directories.
 3. The output directories are specified within each script. You may modify these paths as needed to suit your directory structure.
 
@@ -46,4 +58,3 @@ Ensure all required libraries are installed in your Python environment before ru
 
 - These scripts are designed for exploratory data analysis and visualization. They provide insights into the energetic dynamics of cyclonic systems across their life cycles.
 - The scripts can be modified or extended to accommodate different datasets or additional analyses as needed.
-
