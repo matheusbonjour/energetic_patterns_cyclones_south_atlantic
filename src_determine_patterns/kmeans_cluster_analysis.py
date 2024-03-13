@@ -141,7 +141,7 @@ def sel_clusters_to_df(centers_Ck, centers_Ca, centers_Ke, centers_Ge, tipo_list
     df_cl2 = df_cl1.copy()
     df_cl3 = df_cl1.copy()
     df_cl4 = df_cl1.copy()
-        #att branch
+
     df_cl1['Ck'] = cl1Ck
     df_cl1['Ca'] = cl1Ca
     df_cl1['Ke'] = cl1Ke
