@@ -14,12 +14,12 @@ from sklearn.cluster import KMeans
 
 #database_energy_by_periods 
 # C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/database_energy_by_periods/
-ENERGETICSPATH = 'C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/database_energy_by_periods/'
+ENERGETICSPATH = 'C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/csv_database_energy_by_periods/'
 
 FIGSAVEPATH = os.path.join('C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/figures/patterns/')
 
 
-CSVSAVEPATH = os.path.join('C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/patterns_csv/')
+CSVSAVEPATH = os.path.join('C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/csv_patterns/')
 
 all_files = []
 files = glob.glob(os.path.join(ENERGETICSPATH, "*.csv"))

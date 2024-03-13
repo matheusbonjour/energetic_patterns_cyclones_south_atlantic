@@ -6,7 +6,7 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/21 14:53:09 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/22 08:33:42 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/01 11:49:22 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -106,7 +106,7 @@ def main(base_path):
                 print(f"Error processing {system_dir}: {e}")
 
     # Save the computed averages to CSV files
-    output_base_path = os.path.join("../", 'database_energy_by_periods')
+    output_base_path = os.path.join("../", 'csv_database_energy_by_periods')
     os.makedirs(output_base_path, exist_ok=True)
     for system_dir, averages_df in system_averages.items():
         system_id = system_dir.split('_')[0]

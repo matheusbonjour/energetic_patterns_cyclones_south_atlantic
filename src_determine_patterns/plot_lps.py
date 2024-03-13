@@ -6,13 +6,14 @@
 #    By: daniloceano <danilo.oceano@gmail.com>      +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/02/27 17:45:49 by daniloceano       #+#    #+#              #
-#    Updated: 2024/02/28 22:34:25 by daniloceano      ###   ########.fr        #
+#    Updated: 2024/03/04 09:54:39 by daniloceano      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 
 import os
 import pandas as pd
+from glob import glob
 import matplotlib.pyplot as plt
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from tqdm import tqdm
@@ -35,6 +36,20 @@ def read_life_cycles(base_path):
                 print(f"Error processing {filename}: {e}")
     
     return systems_energetics
+
+def read_patterns(patterns_by_life_cycle_paths):
+    """
+    Reads all CSV files in the specified directory and collects DataFrame for each system.
+    """
+    patterns_energetics = {}
+    for directory in patterns_by_life_cycle_paths:
+        life_cycle_type = os.path.basename(directory)
+        patterns = glob(f'{directory}/*')
+        for pattern in patterns:
+            df = pd.read_csv(pattern)
+            cluster = os.path.basename(pattern).split('_')[1]
+            patterns_energetics[f"{life_cycle_type}_{cluster}"] = df
+    return patterns_energetics
 
 def plot_system(lps, df):
     """
@@ -64,18 +79,14 @@ def determine_global_limits(systems_energetics):
         size_min = min(size_min, df['Ke'].min())
         size_max = max(size_max, df['Ke'].max())
 
-    return [x_min, x_max], [y_min, y_max], [color_min, color_max], [size_min, size_max]
+    return [x_min - 5, x_max + 5], [y_min - 5, y_max + 5], [color_min, color_max], [size_min, size_max]
 
-if __name__ == "__main__":
-    base_path = '../database_energy_by_periods'
-    output_directory = '../figures/lps/'
-    os.makedirs(output_directory, exist_ok=True)
+def plot_all_systems(base_path, output_directory):
+    # Read the energetics data for all systems
+    systems_energetics = read_life_cycles(base_path)
 
     # Initialize the Lorenz Phase Space plotter
     lps = Visualizer(LPS_type='mixed', zoom=False)
-
-    # Read the energetics data for all systems
-    systems_energetics = read_life_cycles(base_path)
 
     # Plot each system onto the Lorenz Phase Space diagram
     for system_id, df in tqdm(systems_energetics.items(), desc="Plotting systems"):
@@ -116,3 +127,118 @@ if __name__ == "__main__":
     plt.savefig(plot_path)
     plt.close()
     print(f"Final plot saved to {plot_path}")
+
+def plot_all_patterns(base_path, output_directory):
+    # Read the energetics data for patterns
+    patterns_path = "../csv_patterns/"
+    patterns_by_life_cycle_paths = glob(f'{patterns_path}/*')
+
+    patterns_energetics = read_patterns(patterns_by_life_cycle_paths)
+
+    # Initialize the Lorenz Phase Space plotter
+    lps = Visualizer(LPS_type='mixed', zoom=False)
+
+    # Plot each system onto the Lorenz Phase Space diagram
+    for system_id, df in tqdm(patterns_energetics.items(), desc="Plotting systems"):
+        plot_system(lps, df)
+
+    # Save the final plot
+    plot_filename = 'lps_all_patterns.png'
+    plot_path = os.path.join(output_directory, plot_filename)
+    plt.savefig(plot_path)
+    plt.close()
+    print(f"Final plot saved to {plot_path}")
+
+    # Determine global limits
+    x_limits, y_limits, color_limits, marker_limits = determine_global_limits(patterns_energetics)
+
+    # Initialize Lorenz Phase Space with dynamic limits and zoom enabled
+    lps = Visualizer(
+        LPS_type='mixed',
+        zoom=True,
+        x_limits=x_limits,
+        y_limits=y_limits,
+        color_limits=color_limits,
+        marker_limits=marker_limits
+    )
+
+    # Plot each system onto the Lorenz Phase Space diagram
+    for species, df in tqdm(patterns_energetics.items(), desc="Plotting systems"):
+        print(f"Plotting {species}")
+        lps.plot_data(
+            x_axis=df['Ck'],
+            y_axis=df['Ca'],
+            marker_color=df['Ge'],
+            marker_size=df['Ke']
+        )
+
+    # Save the final plot
+    plot_filename = 'lps_all_patterns_zoom.png'
+    plot_path = os.path.join(output_directory, plot_filename)
+    plt.savefig(plot_path)
+    plt.close()
+    print(f"Final plot saved to {plot_path}")
+
+def plot_clusters(base_path, output_directory):
+    # Read the energetics data for patterns
+    patterns_path = "../csv_patterns/"
+    patterns_by_life_cycle_paths = glob(f'{patterns_path}/*')
+
+    for directory in patterns_by_life_cycle_paths:
+        life_cycle_type = os.path.basename(directory)
+        patterns = glob(f'{directory}/*')
+
+        patterns_energetics = {}
+
+        for pattern in patterns:
+            df = pd.read_csv(pattern)
+            cluster = os.path.basename(pattern).split('_')[1]
+            patterns_energetics[cluster] = df
+
+        # Determine global limits
+        x_limits, y_limits, color_limits, marker_limits = determine_global_limits(patterns_energetics)
+
+        # Initialize the Lorenz Phase Space plotter with dynamic limits and zoom enabled
+        lps = Visualizer(
+            LPS_type='mixed',
+            zoom=True,
+            x_limits=x_limits,
+            y_limits=y_limits,
+            color_limits=color_limits,
+            marker_limits=marker_limits
+        )
+
+        # Plot each system onto the Lorenz Phase Space diagram
+        for cluster, df in patterns_energetics.items():
+            plot_system(lps, df)
+
+        title = life_cycle_type.replace(
+            "Ic", "Incipient").replace(
+            "It", "Intensification").replace(
+            "M", "Mature").replace(
+            "D", "Decay").replace(
+            "It2", "Intensification 2").replace(
+            "M2", "Mature 2").replace(
+            "D2", "Decay 2")
+        plt.title(f"Life cycle type: {title}")
+
+        # Save the final plot
+        plot_filename = f'lps_{life_cycle_type}.png'
+        plot_path = os.path.join(output_directory, plot_filename)
+        plt.savefig(plot_path)
+        plt.close()
+        print(f"Final plot saved to {plot_path}")
+
+if __name__ == "__main__":
+    base_path = '../csv_database_energy_by_periods'
+    output_directory = '../figures_lps/'
+    os.makedirs(output_directory, exist_ok=True)
+
+    # First: plot all systems
+    plot_all_systems(base_path, output_directory)
+
+    # Now, plot just the patterns 
+    plot_all_patterns(base_path, output_directory)
+
+    # Finally, plot clusters for each pattern in distinct plots
+    plot_clusters(base_path, output_directory)
