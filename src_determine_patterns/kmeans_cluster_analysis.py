@@ -12,68 +12,6 @@ import glob
 from sklearn.datasets import make_blobs
 from sklearn.cluster import KMeans
 
-#database_energy_by_periods 
-# C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/database_energy_by_periods/
-ENERGETICSPATH = 'C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/csv_database_energy_by_periods/'
-
-FIGSAVEPATH = os.path.join('C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/figures/patterns/')
-
-
-CSVSAVEPATH = os.path.join('C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/csv_patterns/')
-
-all_files = []
-files = glob.glob(os.path.join(ENERGETICSPATH, "*.csv"))
-all_files.extend(files)
-
-# Creating a list to save all dataframes
-cyclist1= []
-
-# Reading all files and saving in a list of dataframes
-for case in all_files:
-  columns_to_read = ['Ck','Ca', 'Ke', 'Ge']
-  dfcyc = pd.read_csv(case,header=0,index_col=0)
-  dfcyc = dfcyc[columns_to_read]
-  cyclist1.append(dfcyc)
-
-# Inicializando as listas para cada tipo
-tipo_1_list = []
-tipo_2_list = []
-tipo_3_list = []
-tipo_4_list = []
-tipo_5_list = []
-
-# Definindo os conjuntos de fases para cada tipo
-tipo_1 = {'incipient', 'intensification', 'mature', 'decay'}
-tipo_2 = {'intensification', 'decay'}
-tipo_3 = {'intensification', 'mature', 'decay'}
-tipo_4 = {'incipient', 'intensification', 'mature', 'decay', 'residual'}
-tipo_5 = {'incipient', 'intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2'}
-
-
-
-
-
-# Função para classificar e adicionar cada DataFrame à lista correspondente
-def classificar_e_adicionar(df):
-    fases_presentes = set(df.index.dropna())
-    if fases_presentes == tipo_1:
-        tipo_1_list.append(df)
-    elif fases_presentes == tipo_2:
-        tipo_2_list.append(df)
-    elif fases_presentes == tipo_3:
-        tipo_3_list.append(df)
-    elif fases_presentes == tipo_4:
-        tipo_4_list.append(df)
-    elif fases_presentes == tipo_5:
-        tipo_5_list.append(df)
-
-# Aplicando a função de classificação em todos os DataFrames
-for df in cyclist1:
-    classificar_e_adicionar(df)
-
-
-
-
 def prepare_to_kmeans(cyclist1):
 
     combined_df = pd.concat(cyclist1, axis=1)
@@ -88,17 +26,6 @@ def prepare_to_kmeans(cyclist1):
     return dsk_means
 
 
-dsk_means1 = prepare_to_kmeans(tipo_1_list)
-dsk_means2 = prepare_to_kmeans(tipo_2_list)
-dsk_means3 = prepare_to_kmeans(tipo_3_list)
-dsk_means4 = prepare_to_kmeans(tipo_4_list)
-dsk_means5 = prepare_to_kmeans(tipo_5_list)
-
-mk1 = KMeans(n_clusters=4,n_init=10).fit(dsk_means1)
-mk2 = KMeans(n_clusters=4,n_init=10).fit(dsk_means2)
-mk3 = KMeans(n_clusters=4,n_init=10).fit(dsk_means3)
-mk4 = KMeans(n_clusters=4,n_init=10).fit(dsk_means4)
-mk5 = KMeans(n_clusters=4,n_init=10).fit(dsk_means5)
 
 def slice_mk(mk, tipo):
     slcenter = len(tipo)
@@ -107,12 +34,6 @@ def slice_mk(mk, tipo):
     centers_Ke = mk.cluster_centers_[:,slcenter*2:slcenter*3]
     centers_Ge = mk.cluster_centers_[:,slcenter*3:slcenter*4]
     return centers_Ck, centers_Ca, centers_Ke, centers_Ge
-
-centers_Ck1, centers_Ca1, centers_Ke1, centers_Ge1 = slice_mk(mk1, tipo_1)
-centers_Ck2, centers_Ca2, centers_Ke2, centers_Ge2 = slice_mk(mk2, tipo_2)
-centers_Ck3, centers_Ca3, centers_Ke3, centers_Ge3 = slice_mk(mk3, tipo_3)
-centers_Ck4, centers_Ca4, centers_Ke4, centers_Ge4 = slice_mk(mk4, tipo_4)
-centers_Ck5, centers_Ca5, centers_Ke5, centers_Ge5 = slice_mk(mk5, tipo_5)
 
 
 def sel_clusters_to_df(centers_Ck, centers_Ca, centers_Ke, centers_Ge, tipo_list):
@@ -164,6 +85,110 @@ def sel_clusters_to_df(centers_Ck, centers_Ca, centers_Ke, centers_Ge, tipo_list
 
     return df_cl1, df_cl2, df_cl3, df_cl4
 
+# Função para classificar e adicionar cada DataFrame à lista correspondente
+def classificar_e_adicionar(df):
+    fases_presentes = set(df.index.dropna())
+    if fases_presentes == tipo_1:
+        tipo_1_list.append(df)
+    elif fases_presentes == tipo_2:
+        tipo_2_list.append(df)
+    elif fases_presentes == tipo_3:
+        tipo_3_list.append(df)
+    elif fases_presentes == tipo_4:
+        tipo_4_list.append(df)
+    elif fases_presentes == tipo_5:
+        tipo_5_list.append(df)
+
+
+
+
+
+
+#database_energy_by_periods 
+# C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/database_energy_by_periods/
+ENERGETICSPATH = 'C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/csv_database_energy_by_periods/'
+
+FIGSAVEPATH = os.path.join('C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/figures/patterns/')
+
+
+CSVSAVEPATH = os.path.join('C:/Users/matheus/Desktop/danilo/energetic_patterns_cyclones_south_atlantic/csv_patterns/')
+
+all_files = []
+files = glob.glob(os.path.join(ENERGETICSPATH, "*.csv"))
+all_files.extend(files)
+
+# Creating a list to save all dataframes
+cyclist1= []
+
+# Reading all files and saving in a list of dataframes
+for case in all_files:
+  columns_to_read = ['Ck','Ca', 'Ke', 'Ge']
+  dfcyc = pd.read_csv(case,header=0,index_col=0)
+  dfcyc = dfcyc[columns_to_read]
+  cyclist1.append(dfcyc)
+
+# Inicializando as listas para cada tipo
+tipo_1_list = []
+tipo_2_list = []
+tipo_3_list = []
+tipo_4_list = []
+tipo_5_list = []
+
+# Definindo os conjuntos de fases para cada tipo
+tipo_1 = {'incipient', 'intensification', 'mature', 'decay'}
+tipo_2 = {'intensification', 'decay'}
+tipo_3 = {'intensification', 'mature', 'decay'}
+tipo_4 = {'incipient', 'intensification', 'mature', 'decay', 'residual'}
+tipo_5 = {'incipient', 'intensification', 'mature', 'decay', 'intensification 2', 'mature 2', 'decay 2'}
+
+
+def classificar_e_adicionar(df):
+    fases_presentes = set(df.index.dropna())
+    if fases_presentes == tipo_1:
+        tipo_1_list.append(df)
+    elif fases_presentes == tipo_2:
+        tipo_2_list.append(df)
+    elif fases_presentes == tipo_3:
+        tipo_3_list.append(df)
+    elif fases_presentes == tipo_4:
+        tipo_4_list.append(df)
+    elif fases_presentes == tipo_5:
+        tipo_5_list.append(df)
+
+
+# Aplicando a função de classificação em todos os DataFrames
+for df in cyclist1:
+    classificar_e_adicionar(df)
+
+
+
+dsk_means1 = prepare_to_kmeans(tipo_1_list)
+dsk_means2 = prepare_to_kmeans(tipo_2_list)
+dsk_means3 = prepare_to_kmeans(tipo_3_list)
+dsk_means4 = prepare_to_kmeans(tipo_4_list)
+dsk_means5 = prepare_to_kmeans(tipo_5_list)
+
+numcluster = 5
+ninit = 10
+maxiter = 500
+
+mk1 = KMeans(n_clusters=numcluster,n_init=ninit, max_iter=maxiter).fit(dsk_means1)
+mk2 = KMeans(n_clusters=numcluster,n_init=ninit, max_iter=maxiter).fit(dsk_means2)
+mk3 = KMeans(n_clusters=numcluster,n_init=ninit, max_iter=maxiter).fit(dsk_means3)
+mk4 = KMeans(n_clusters=numcluster,n_init=ninit, max_iter=maxiter).fit(dsk_means4)
+mk5 = KMeans(n_clusters=numcluster,n_init=ninit, max_iter=maxiter).fit(dsk_means5)
+
+
+
+centers_Ck1, centers_Ca1, centers_Ke1, centers_Ge1 = slice_mk(mk1, tipo_1)
+centers_Ck2, centers_Ca2, centers_Ke2, centers_Ge2 = slice_mk(mk2, tipo_2)
+centers_Ck3, centers_Ca3, centers_Ke3, centers_Ge3 = slice_mk(mk3, tipo_3)
+centers_Ck4, centers_Ca4, centers_Ke4, centers_Ge4 = slice_mk(mk4, tipo_4)
+centers_Ck5, centers_Ca5, centers_Ke5, centers_Ge5 = slice_mk(mk5, tipo_5)
+
+
+
+
 df1_cl1, df1_cl2, df1_cl3, df1_cl4 = sel_clusters_to_df(centers_Ck1, centers_Ca1, centers_Ke1, centers_Ge1, tipo_1_list)
 df2_cl1, df2_cl2, df2_cl3, df2_cl4 = sel_clusters_to_df(centers_Ck2, centers_Ca2, centers_Ke2, centers_Ge2, tipo_2_list)
 df3_cl1, df3_cl2, df3_cl3, df3_cl4 = sel_clusters_to_df(centers_Ck3, centers_Ca3, centers_Ke3, centers_Ge3, tipo_3_list)
@@ -191,6 +216,35 @@ if not os.path.exists(t4_folder):
     os.makedirs(t4_folder)
 if not os.path.exists(t5_folder):
     os.makedirs(t5_folder)
+
+
+# Exemplo de lista de DataFrames (substitua pelos seus DataFrames reais)
+dfs = [df1, df2, df3, df4, df5]
+
+# Exemplo de lista de pastas correspondentes a cada DataFrame
+folders = ['t1_folder/', 't2_folder/', 't3_folder/', 't4_folder/', 't5_folder/']
+
+# Número de clusters (ajuste conforme necessário)
+num_clusters = 4
+
+# Iterar sobre cada DataFrame e cada cluster
+for i, df in enumerate(dfs):
+    for cluster_num in range(1, num_clusters + 1):
+        # Construir o nome do arquivo CSV
+        csv_file_name = f'df{i+1}_cl{cluster_num}.csv'
+        
+        # Extrair o DataFrame do cluster específico
+        # Supondo que `df` já seja o DataFrame filtrado para um cluster específico, 
+        # caso contrário, você precisaria filtrar df aqui com base no cluster_num
+        df_cluster = df  # Substitua esta linha pelo seu método de filtragem de clusters
+        
+        # Construir o caminho completo para o arquivo CSV
+        csv_path = folders[i] + csv_file_name
+        
+        # Salvar o DataFrame do cluster em um arquivo CSV
+        df_cluster.to_csv(csv_path)
+
+        print(f'Salvo: {csv_path}')
 
 
 df1_cl1.to_csv(t1_folder + 'df1_cl1.csv')
